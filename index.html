@@ -562,7 +562,115 @@
   .acc-bal{font-size:12px; color:var(--text-2); margin-top:2px; font-variant-numeric:tabular-nums;}
   .acc-arrow{color:var(--text-2); font-size:14px;}
 
+  /* ---------- calculator ---------- */
+  .calc-fab{position:absolute; top:0; left:0; z-index:60;
+    width:42px; height:42px; border-radius:50%; cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center; color:var(--gold);
+    background:linear-gradient(150deg, rgba(185,164,131,.16), rgba(185,164,131,.05));
+    border:1px solid var(--glass-brd-strong); box-shadow:var(--sh-sm);
+    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
+  .calc-fab:active{transform:scale(.88); background:rgba(185,164,131,.24);}
+  .calc-fab.on{background:linear-gradient(135deg,#cbb894,#ab9670); color:#1a1410; border-color:transparent;}
+
+  .calc{position:fixed; z-index:250; width:264px; padding:14px;
+    border-radius:22px; display:none;
+    background:linear-gradient(170deg,#1a140c 0%,#141009 55%,#100d09 100%);
+    border:1px solid var(--glass-brd-strong); box-shadow:var(--sh-lg);
+    animation:pageIn .28s var(--ease-out) both;}
+  .calc.show{display:block;}
+  .calc-head{display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; cursor:grab; touch-action:none;}
+  .calc-head:active{cursor:grabbing;}
+  .calc-title{font-size:11px; color:var(--text-2); letter-spacing:1.6px; font-weight:700;}
+  .calc-close{width:26px; height:26px; border-radius:50%; border:1px solid var(--glass-brd);
+    background:rgba(185,164,131,.06); color:var(--text-1); font-size:11px; cursor:pointer;}
+  .calc-expr{min-height:15px; text-align:left; direction:ltr;
+    font-size:11.5px; color:var(--text-2); font-variant-numeric:tabular-nums;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .calc-out{text-align:left; direction:ltr; font-family:'Amiri',serif;
+    font-size:30px; font-weight:700; line-height:1.2; margin:2px 0 12px;
+    color:var(--text-0); font-variant-numeric:tabular-nums;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .calc-pad{display:grid; grid-template-columns:repeat(4,1fr); gap:7px;}
+  .ck{height:44px; border-radius:14px; cursor:pointer; font-family:inherit;
+    font-size:16px; font-weight:700; color:var(--text-0);
+    background:rgba(185,164,131,.07); border:1px solid var(--glass-brd);
+    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
+  .ck:active{transform:scale(.92); background:rgba(185,164,131,.18);}
+  .ck.fn{color:var(--text-1); font-size:14px;}
+  .ck.op{color:var(--gold); background:rgba(185,164,131,.13);}
+  .ck.eq{grid-row:span 2; background:linear-gradient(150deg,#cbb894,#ab9670 60%,#7a6a4d); color:#1a1410;
+    border:none; font-size:19px;}
+  .ck.wide{grid-column:span 2;}
+
   /* ---------- subscriptions ---------- */
+  /* ---------- google search ---------- */
+  .search-bar{display:flex; gap:10px; align-items:center; margin-bottom:12px;}
+  .search-chips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;}
+  .search-chip{font-size:11.5px; padding:8px 13px; border-radius:99px; cursor:pointer;
+    color:var(--text-1); background:var(--glass); border:1px solid var(--glass-brd);
+    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
+  .search-chip:active{transform:scale(.94); background:rgba(185,164,131,.13); color:var(--text-0);}
+
+  .sr{display:block; padding:15px 16px; margin-bottom:11px; border-radius:20px;
+    text-decoration:none; cursor:pointer;
+    background:linear-gradient(150deg, rgba(185,164,131,.075), rgba(185,164,131,.03) 55%, transparent);
+    border:1px solid var(--glass-brd); border-inline-start:3px solid var(--gold);
+    box-shadow:var(--sh-md);
+    transition:transform var(--dur-fast) var(--ease-spring), border-color var(--dur-mid) var(--ease-soft);}
+  .sr:active{transform:scale(.985); border-color:var(--glass-brd-strong);}
+  .sr-site{font-size:10px; color:var(--text-2); letter-spacing:.6px; margin-bottom:5px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .sr-title{font-size:14.5px; font-weight:700; color:#cbb894; line-height:1.45;}
+  .sr-snip{font-size:12px; color:var(--text-1); margin-top:6px; line-height:1.65;}
+  .search-note{padding:16px; border-radius:18px; font-size:12px; line-height:1.9;
+    color:var(--text-1); background:rgba(185,164,131,.05); border:1px solid var(--glass-brd);}
+  .search-note b{color:var(--gold);}
+  .search-note code{font-size:11px; background:rgba(12,10,8,.6); padding:2px 6px; border-radius:6px;
+    direction:ltr; display:inline-block;}
+  .search-spin{text-align:center; padding:30px 0; color:var(--text-2); font-size:13px;}
+
+  /* ---------- calculator ---------- */
+  .calc-fab{position:absolute; top:0; left:0; z-index:60;
+    width:42px; height:42px; border-radius:50%; cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center; color:var(--gold);
+    background:linear-gradient(150deg, rgba(185,164,131,.16), rgba(185,164,131,.05));
+    border:1px solid var(--glass-brd-strong); box-shadow:var(--sh-sm);
+    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
+  .calc-fab:active{transform:scale(.88); background:rgba(185,164,131,.24);}
+  .calc-fab.on{background:linear-gradient(135deg,#cbb894,#ab9670); color:#1a1410; border-color:transparent;}
+
+  .calc{position:fixed; z-index:250; width:264px; padding:14px;
+    border-radius:22px; display:none;
+    background:linear-gradient(170deg,#1a140c 0%,#141009 55%,#100d09 100%);
+    border:1px solid var(--glass-brd-strong); box-shadow:var(--sh-lg);
+    animation:pageIn .28s var(--ease-out) both;}
+  .calc.show{display:block;}
+  .calc-head{display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px; cursor:grab; touch-action:none;}
+  .calc-head:active{cursor:grabbing;}
+  .calc-title{font-size:11px; color:var(--text-2); letter-spacing:1.6px; font-weight:700;}
+  .calc-close{width:26px; height:26px; border-radius:50%; border:1px solid var(--glass-brd);
+    background:rgba(185,164,131,.06); color:var(--text-1); font-size:11px; cursor:pointer;}
+  .calc-expr{min-height:15px; text-align:left; direction:ltr;
+    font-size:11.5px; color:var(--text-2); font-variant-numeric:tabular-nums;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .calc-out{text-align:left; direction:ltr; font-family:'Amiri',serif;
+    font-size:30px; font-weight:700; line-height:1.2; margin:2px 0 12px;
+    color:var(--text-0); font-variant-numeric:tabular-nums;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .calc-pad{display:grid; grid-template-columns:repeat(4,1fr); gap:7px;}
+  .ck{height:44px; border-radius:14px; cursor:pointer; font-family:inherit;
+    font-size:16px; font-weight:700; color:var(--text-0);
+    background:rgba(185,164,131,.07); border:1px solid var(--glass-brd);
+    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
+  .ck:active{transform:scale(.92); background:rgba(185,164,131,.18);}
+  .ck.fn{color:var(--text-1); font-size:14px;}
+  .ck.op{color:var(--gold); background:rgba(185,164,131,.13);}
+  .ck.eq{grid-row:span 2; background:linear-gradient(150deg,#cbb894,#ab9670 60%,#7a6a4d); color:#1a1410;
+    border:none; font-size:19px;}
+  .ck.wide{grid-column:span 2;}
+
   /* ---------- subscriptions ---------- */
   .sub-summary{display:flex; align-items:center; padding:16px 14px; margin-bottom:14px; border-radius:22px;
     background:linear-gradient(165deg, rgba(185,164,131,.11), rgba(185,164,131,.03) 62%, transparent);
@@ -1115,6 +1223,51 @@
 
   <!-- PAGE: FINANCE -->
   <div class="page" id="page-finance">
+    <button class="calc-fab" id="calcFab" aria-label="حاسبة">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+           stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+        <rect x="4" y="2.5" width="16" height="19" rx="3"/>
+        <line x1="7.5" y1="7" x2="16.5" y2="7"/>
+        <line x1="8" y1="12" x2="8" y2="12"/><line x1="12" y1="12" x2="12" y2="12"/>
+        <line x1="16" y1="12" x2="16" y2="12"/>
+        <line x1="8" y1="16.5" x2="8" y2="16.5"/><line x1="12" y1="16.5" x2="12" y2="16.5"/>
+        <line x1="16" y1="16.5" x2="16" y2="16.5"/>
+      </svg>
+    </button>
+
+    <div class="calc" id="calcPanel">
+      <div class="calc-head" id="calcHead">
+        <span class="calc-title">حاسبة</span>
+        <button class="calc-close" id="calcClose" aria-label="إغلاق">✕</button>
+      </div>
+      <div class="calc-expr" id="calcExpr">&nbsp;</div>
+      <div class="calc-out" id="calcOut">0</div>
+      <div class="calc-pad" id="calcPad">
+        <button class="ck fn" data-k="C">C</button>
+        <button class="ck fn" data-k="back">⌫</button>
+        <button class="ck fn" data-k="%">%</button>
+        <button class="ck op" data-k="*">×</button>
+
+        <button class="ck" data-k="7">7</button>
+        <button class="ck" data-k="8">8</button>
+        <button class="ck" data-k="9">9</button>
+        <button class="ck op" data-k="-">−</button>
+
+        <button class="ck" data-k="4">4</button>
+        <button class="ck" data-k="5">5</button>
+        <button class="ck" data-k="6">6</button>
+        <button class="ck op" data-k="+">+</button>
+
+        <button class="ck" data-k="1">1</button>
+        <button class="ck" data-k="2">2</button>
+        <button class="ck" data-k="3">3</button>
+        <button class="ck eq" data-k="=" rowspan>=</button>
+
+        <button class="ck wide" data-k="0">0</button>
+        <button class="ck" data-k=".">.</button>
+      </div>
+    </div>
+
     <div id="finList"></div>
     <div id="finAccountsView">
       <div class="section-head" style="margin-top:0;">
@@ -2158,7 +2311,7 @@ function buildSkyScene(isNight, cond){
   const box = document.getElementById('heroScene').getBoundingClientRect();
   const VH  = 470;
   const VW  = Math.max(400, Math.round(VH * ((box.width||390) / (box.height||458))));
-  const BX  = Math.round(VW * 0.145);   // where the sun/moon sits
+  const BX  = Math.round(VW * 0.185);   // where the sun/moon sits
   const BY  = 150;
   const heavy   = (cond === 'rain' || cond === 'storm');
   const overcast= (cond === 'cloudy' || cond === 'fog' || heavy);
@@ -2240,7 +2393,7 @@ function buildSkyScene(isNight, cond){
       <animate attributeName="opacity" values="0.75;1;0.75" dur="9s" repeatCount="indefinite"/>
     </circle>`;
   if(isNight){
-    body += `<path d="${crescentPath(BX, BY, 31, 27, 16, -11)}" fill="#ffffff"/>`;
+    body += `<path d="${crescentPath(BX, BY, 31, 27, -16, -11)}" fill="#ffffff"/>`;
   } else {
     let rays = '';
     if(!overcast){
@@ -3296,6 +3449,145 @@ document.getElementById('chartRange').addEventListener('click', e=>{
 
 document.getElementById('finBackBtn').addEventListener('click', backToAccounts);
 renderAccounts();
+
+/* ================= CALCULATOR =================
+   Small floating pad for the finance page: + − × and %.
+   It stays open while you move between accounts, and can be dragged. */
+(function initCalc(){
+  const fab   = document.getElementById('calcFab');
+  const panel = document.getElementById('calcPanel');
+  const outEl = document.getElementById('calcOut');
+  const exprEl= document.getElementById('calcExpr');
+
+  let cur = '0';        // number being typed
+  let acc = null;       // running total
+  let op  = null;       // pending operator
+  let fresh = true;     // next digit starts a new number
+
+  const fmt = n => {
+    if(!isFinite(n)) return 'خطأ';
+    const r = Math.round(n * 1e9) / 1e9;
+    return String(r).length > 14 ? r.toPrecision(10).replace(/\.?0+$/,'') : String(r);
+  };
+  const draw = ()=>{
+    outEl.textContent = cur;
+    exprEl.innerHTML = op ? `${fmt(acc)} ${({'+':'+','-':'−','*':'×'})[op]}` : '&nbsp;';
+  };
+  const apply = (a, b, o)=>{
+    if(o === '+') return a + b;
+    if(o === '-') return a - b;
+    if(o === '*') return a * b;
+    return b;
+  };
+
+  function press(k){
+    if(/^[0-9]$/.test(k)){
+      cur = (fresh || cur === '0') ? k : cur + k;
+      fresh = false;
+    }
+    else if(k === '.'){
+      if(fresh){ cur = '0.'; fresh = false; }
+      else if(!cur.includes('.')) cur += '.';
+    }
+    else if(k === 'C'){ cur='0'; acc=null; op=null; fresh=true; }
+    else if(k === 'back'){
+      if(fresh){ cur='0'; }
+      else { cur = cur.length > 1 ? cur.slice(0,-1) : '0'; if(cur==='0') fresh=true; }
+    }
+    else if(k === '%'){
+      // percent of the running total when chaining, otherwise plain /100
+      const v = parseFloat(cur) || 0;
+      cur = fmt(op !== null && acc !== null ? acc * v / 100 : v / 100);
+      fresh = true;
+    }
+    else if(k === '+' || k === '-' || k === '*'){
+      const v = parseFloat(cur) || 0;
+      acc = (acc === null || op === null) ? v : apply(acc, v, op);
+      cur = fmt(acc); op = k; fresh = true;
+    }
+    else if(k === '='){
+      if(op !== null && acc !== null){
+        cur = fmt(apply(acc, parseFloat(cur) || 0, op));
+        acc = null; op = null; fresh = true;
+      }
+    }
+    draw();
+  }
+
+  document.getElementById('calcPad').addEventListener('click', e=>{
+    const btn = e.target.closest('.ck');
+    if(btn) press(btn.dataset.k);
+  });
+
+  // ---- open / close ----
+  function toggle(show){
+    const on = show === undefined ? !panel.classList.contains('show') : show;
+    panel.classList.toggle('show', on);
+    fab.classList.toggle('on', on);
+    if(on && !panel.dataset.placed){
+      const r = fab.getBoundingClientRect();
+      const w = 264, h = 330;
+      panel.style.top  = Math.max(6, Math.min(r.bottom + 10, innerHeight - h - 6)) + 'px';
+      panel.style.left = Math.max(6, Math.min(r.left, innerWidth - w - 6)) + 'px';
+      panel.dataset.placed = '1';
+    }
+    if(on) requestAnimationFrame(clamp);
+  }
+  fab.addEventListener('click', ()=> toggle());
+  document.getElementById('calcClose').addEventListener('click', ()=> toggle(false));
+
+  // ---- drag by the header ----
+  const head = document.getElementById('calcHead');
+  let dragging = false, offX = 0, offY = 0;
+  const start = (x, y)=>{
+    const r = panel.getBoundingClientRect();
+    dragging = true; offX = x - r.left; offY = y - r.top;
+  };
+  const move = (x, y)=>{
+    if(!dragging) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    panel.style.left = Math.max(6, Math.min(x - offX, innerWidth  - w - 6)) + 'px';
+    panel.style.top  = Math.max(6, Math.min(y - offY, innerHeight - h - 6)) + 'px';
+  };
+  head.addEventListener('pointerdown', e=>{
+    if(e.target.closest('.calc-close')) return;
+    start(e.clientX, e.clientY);
+    head.setPointerCapture(e.pointerId);
+  });
+  head.addEventListener('pointermove', e=>{ if(dragging){ e.preventDefault(); move(e.clientX, e.clientY); } });
+  head.addEventListener('pointerup',   ()=>{ dragging = false; clamp(); });
+  head.addEventListener('pointercancel',()=>{ dragging = false; clamp(); });
+
+  // never let it end up partly off-screen
+  function clamp(){
+    if(!panel.classList.contains('show')) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const l = parseFloat(panel.style.left) || 0;
+    const t = parseFloat(panel.style.top)  || 0;
+    panel.style.left = Math.max(6, Math.min(l, innerWidth  - w - 6)) + 'px';
+    panel.style.top  = Math.max(6, Math.min(t, innerHeight - h - 6)) + 'px';
+  }
+  window.addEventListener('resize', clamp);
+
+  // hardware keyboard, handy on the Mac
+  document.addEventListener('keydown', e=>{
+    if(!panel.classList.contains('show')) return;
+    if(document.querySelector('.modal-overlay.show')) return;
+    const t = (document.activeElement||{}).tagName;
+    if(t === 'INPUT' || t === 'TEXTAREA') return;
+    const k = e.key;
+    if(/^[0-9.]$/.test(k)) press(k);
+    else if(k === '+' || k === '-' || k === '*') press(k);
+    else if(k === '%') press('%');
+    else if(k === 'Enter' || k === '=') press('=');
+    else if(k === 'Backspace') press('back');
+    else if(k === 'Escape') toggle(false);
+    else return;
+    e.preventDefault();
+  });
+
+  draw();
+})();
 
 /* ================= SUBSCRIPTIONS =================
    Each subscription bills on a repeating cycle starting from its start date.
