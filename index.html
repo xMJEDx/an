@@ -81,7 +81,7 @@
     letter-spacing:.1px;
   }
   body::after{content:''; position:fixed; inset:0; pointer-events:none; z-index:1;
-    background:radial-gradient(ellipse 130% 100% at 50% 50%, transparent 55%, rgba(0,0,0,.38) 100%);}
+    background:radial-gradient(ellipse 130% 100% at 50% 50%, transparent 68%, rgba(0,0,0,.28) 100%);}
   .wrap{max-width:520px; margin:0 auto; position:relative; z-index:2;
     padding:calc(16px + env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));}
 
@@ -113,25 +113,26 @@
     background:transparent; border:none; border-radius:0; box-shadow:none;}
   /* full-bleed sky that fades out instead of ending at a hard edge */
   .hero-sky{position:absolute; top:-150px; left:50%; transform:translateX(-50%);
-    width:100vw; height:calc(100% + 210px); z-index:0; pointer-events:none;
+    width:100vw; height:calc(100% + 158px); z-index:0; pointer-events:none;
     overflow:hidden; contain:paint;
     transition:background 1.4s var(--ease-soft);
     /* soft oval fade on every side — no straight edges anywhere */
-    -webkit-mask-image:radial-gradient(130% 95% at 50% 34%,
-      #000 0%, #000 68%, rgba(0,0,0,.85) 82%, rgba(0,0,0,.4) 93%, transparent 100%);
-    mask-image:radial-gradient(130% 95% at 50% 34%,
-      #000 0%, #000 68%, rgba(0,0,0,.85) 82%, rgba(0,0,0,.4) 93%, transparent 100%);}
+    -webkit-mask-image:radial-gradient(135% 88% at 50% 30%,
+      #000 0%, #000 58%, rgba(0,0,0,.8) 74%, rgba(0,0,0,.32) 88%, transparent 100%);
+    mask-image:radial-gradient(135% 88% at 50% 30%,
+      #000 0%, #000 58%, rgba(0,0,0,.8) 74%, rgba(0,0,0,.32) 88%, transparent 100%);}
   .hero.is-night .hero-sky{background:
-    radial-gradient(ellipse 90% 70% at 72% 8%, rgba(74,47,82,.34), transparent 62%),
-    radial-gradient(ellipse 80% 60% at 12% 0%, rgba(138,51,65,.16), transparent 60%);}
+    radial-gradient(ellipse 70% 55% at 16% 26%, rgba(58,70,104,.30), transparent 66%),
+    linear-gradient(180deg, #05070e 0%, #080a12 55%, #0a0a10 100%);}
   .hero.is-day .hero-sky{background:
-    radial-gradient(ellipse 90% 70% at 78% 4%, rgba(185,164,131,.26), transparent 60%),
-    radial-gradient(ellipse 85% 65% at 8% 12%, rgba(168,92,58,.14), transparent 62%);}
+    radial-gradient(ellipse 70% 58% at 16% 24%, rgba(196,168,116,.30), transparent 64%),
+    linear-gradient(180deg, #14100c 0%, #100d0a 60%, #0c0a08 100%);}
   .hero-scene{position:absolute; inset:0; z-index:0; pointer-events:none;
     opacity:0; transition:opacity 1.1s var(--ease-soft);}
   .hero-scene.in{opacity:1;}
-  .hero-orb{position:absolute; top:-50px; inset-inline-end:-40px; width:250px; height:250px; border-radius:50%;
-    filter:blur(55px); opacity:.3; z-index:0; transition:background 1s ease;}
+  /* retired: this blurred blob sat on top of the sky and muddied the moon,
+     stars and clouds. kept as a no-op so existing JS references stay safe. */
+  .hero-orb{display:none;}
   .hero-inner{position:relative; z-index:2;}
   .hero-top{display:flex; justify-content:space-between; align-items:flex-start;}
   .hero-right{display:flex; flex-direction:column; align-items:flex-start; gap:3px;}
@@ -2165,7 +2166,7 @@ function buildSkyScene(isNight, cond){
       <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
     <filter id="cloudBlur" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="2.2"/>
+      <feGaussianBlur stdDeviation="1.4"/>
     </filter>
     <linearGradient id="cloudFill" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%"   stop-color="${cloudTop}"/>
@@ -2232,13 +2233,13 @@ function buildSkyScene(isNight, cond){
   }
 
   /* ---- sun or moon, dimmed when the sky is covered ---- */
-  const bodyOpacity = heavy ? 0.5 : (overcast ? 0.75 : 1);
+  const bodyOpacity = heavy ? 0.30 : (overcast ? 0.62 : 1);
   let body = `<g opacity="${bodyOpacity}">
-    <circle cx="${BX}" cy="${BY}" r="${isNight ? 60 : 58}" fill="url(#bodyGlow)">
+    <circle cx="${BX}" cy="${BY}" r="${isNight ? 74 : 70}" fill="url(#bodyGlow)">
       <animate attributeName="opacity" values="0.75;1;0.75" dur="9s" repeatCount="indefinite"/>
     </circle>`;
   if(isNight){
-    body += `<circle cx="${BX}" cy="${BY}" r="27" fill="#fffdf6" mask="url(#moonCut)" filter="url(#moonSoft)"/>`;
+    body += `<circle cx="${BX}" cy="${BY}" r="31" fill="#fffef9" mask="url(#moonCut)"/>`;
   } else {
     let rays = '';
     if(!overcast){
@@ -2299,12 +2300,12 @@ function buildSkyScene(isNight, cond){
     const drops = cond === 'storm' ? 46 : 34;
     for(let i=0;i<drops;i++){
       const x = rand(-20, VW+20).toFixed(1);
-      const len = rand(11,20).toFixed(1);
+      const len = rand(15,26).toFixed(1);
       const dur = rand(0.55,1.05).toFixed(2);
       const delay = rand(0,1.2).toFixed(2);
-      const op = rand(0.18,0.45).toFixed(2);
+      const op = rand(0.34,0.72).toFixed(2);
       rain += `<line x1="${x}" y1="-30" x2="${(+x-9).toFixed(1)}" y2="${(-30+ +len).toFixed(1)}"
-        stroke="#bcd2e6" stroke-width="1.1" stroke-linecap="round" opacity="${op}">
+        stroke="#d3e4f4" stroke-width="1.7" stroke-linecap="round" opacity="${op}">
         <animateTransform attributeName="transform" type="translate"
           from="0 0" to="-60 500" dur="${dur}s" begin="${delay}s" repeatCount="indefinite"/>
       </line>`;
