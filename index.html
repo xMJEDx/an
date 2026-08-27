@@ -2132,6 +2132,26 @@ function applyWeather(){
 
 /* ---- animated sky ----------------------------------------------------
    One builder that draws the sky for a given time of day + condition. */
+/* Crescent drawn from the two circle intersection points, so no <mask> is
+   needed — masks behave inconsistently in Safari on injected SVG. */
+function crescentPath(cx, cy, R, r, dx, dy){
+  const d = Math.hypot(dx, dy);
+  if(d === 0 || d >= R + r) return `M ${cx-R} ${cy} a ${R} ${R} 0 1 0 ${R*2} 0 a ${R} ${R} 0 1 0 ${-R*2} 0`;
+  const a  = (R*R - r*r + d*d) / (2*d);
+  const h2 = R*R - a*a;
+  if(h2 <= 0) return '';
+  const h  = Math.sqrt(h2);
+  const ux = dx/d, uy = dy/d;            // unit vector towards the bite
+  const bx = cx + a*ux,  by = cy + a*uy; // point on the radical line
+  const px = -uy, py = ux;               // perpendicular
+  const p1x = bx + h*px, p1y = by + h*py;
+  const p2x = bx - h*px, p2y = by - h*py;
+  // outer arc the long way round, then the inner arc back
+  return `M ${p1x.toFixed(2)} ${p1y.toFixed(2)}`
+       + ` A ${R} ${R} 0 1 0 ${p2x.toFixed(2)} ${p2y.toFixed(2)}`
+       + ` A ${r} ${r} 0 0 1 ${p1x.toFixed(2)} ${p1y.toFixed(2)} Z`;
+}
+
 function buildSkyScene(isNight, cond){
   const rand = (a,b)=> a + Math.random()*(b-a);
   // match the viewBox to the real box so nothing gets blown up on wide screens
@@ -2152,11 +2172,6 @@ function buildSkyScene(isNight, cond){
       <stop offset="0%" stop-color="${isNight ? '#fffaf0' : '#d9c08a'}" stop-opacity="${overcast ? 0.32 : 0.62}"/>
       <stop offset="100%" stop-color="${isNight ? '#efe9d4' : '#ab9670'}" stop-opacity="0"/>
     </radialGradient>
-    <mask id="moonCut">
-      <rect x="0" y="0" width="400" height="470" fill="#000"/>
-      <circle cx="58" cy="150" r="24" fill="#fff"/>
-      <circle cx="71" cy="141" r="21" fill="#000"/>
-    </mask>
     <radialGradient id="puff" cx="42%" cy="34%" r="68%">
       <stop offset="0%"  stop-color="${cloudTop}"    stop-opacity="1"/>
       <stop offset="62%" stop-color="${cloudBottom}" stop-opacity="1"/>
@@ -2225,7 +2240,7 @@ function buildSkyScene(isNight, cond){
       <animate attributeName="opacity" values="0.75;1;0.75" dur="9s" repeatCount="indefinite"/>
     </circle>`;
   if(isNight){
-    body += `<circle cx="${BX}" cy="${BY}" r="31" fill="#ffffff" mask="url(#moonCut)"/>`;
+    body += `<path d="${crescentPath(BX, BY, 31, 27, 16, -11)}" fill="#ffffff"/>`;
   } else {
     let rays = '';
     if(!overcast){
