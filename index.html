@@ -87,7 +87,8 @@
 
   /* ---------- top bar ---------- */
   .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;
-    position:relative; z-index:3;}
+    position:relative; z-index:3; pointer-events:none;}
+  .topbar > *{pointer-events:auto;}
   .hamburger{width:44px; height:44px; border-radius:15px; background:var(--glass); border:1px solid var(--glass-brd);
     color:var(--text-0); font-size:17px; cursor:pointer; display:flex; align-items:center; justify-content:center;
     box-shadow:var(--sh-sm);
@@ -563,75 +564,7 @@
   .acc-arrow{color:var(--text-2); font-size:14px;}
 
   /* ---------- calculator ---------- */
-  .calc-fab{position:absolute; top:0; left:0; z-index:60;
-    width:42px; height:42px; border-radius:50%; cursor:pointer; padding:0;
-    display:flex; align-items:center; justify-content:center; color:var(--gold);
-    background:linear-gradient(150deg, rgba(185,164,131,.16), rgba(185,164,131,.05));
-    border:1px solid var(--glass-brd-strong); box-shadow:var(--sh-sm);
-    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
-  .calc-fab:active{transform:scale(.88); background:rgba(185,164,131,.24);}
-  .calc-fab.on{background:linear-gradient(135deg,#cbb894,#ab9670); color:#1a1410; border-color:transparent;}
-
-  .calc{position:fixed; z-index:250; width:264px; padding:14px;
-    border-radius:22px; display:none;
-    background:linear-gradient(170deg,#1a140c 0%,#141009 55%,#100d09 100%);
-    border:1px solid var(--glass-brd-strong); box-shadow:var(--sh-lg);
-    animation:pageIn .28s var(--ease-out) both;}
-  .calc.show{display:block;}
-  .calc-head{display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:10px; cursor:grab; touch-action:none;}
-  .calc-head:active{cursor:grabbing;}
-  .calc-title{font-size:11px; color:var(--text-2); letter-spacing:1.6px; font-weight:700;}
-  .calc-close{width:26px; height:26px; border-radius:50%; border:1px solid var(--glass-brd);
-    background:rgba(185,164,131,.06); color:var(--text-1); font-size:11px; cursor:pointer;}
-  .calc-expr{min-height:15px; text-align:left; direction:ltr;
-    font-size:11.5px; color:var(--text-2); font-variant-numeric:tabular-nums;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .calc-out{text-align:left; direction:ltr; font-family:'Amiri',serif;
-    font-size:30px; font-weight:700; line-height:1.2; margin:2px 0 12px;
-    color:var(--text-0); font-variant-numeric:tabular-nums;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .calc-pad{display:grid; grid-template-columns:repeat(4,1fr); gap:7px;}
-  .ck{height:44px; border-radius:14px; cursor:pointer; font-family:inherit;
-    font-size:16px; font-weight:700; color:var(--text-0);
-    background:rgba(185,164,131,.07); border:1px solid var(--glass-brd);
-    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
-  .ck:active{transform:scale(.92); background:rgba(185,164,131,.18);}
-  .ck.fn{color:var(--text-1); font-size:14px;}
-  .ck.op{color:var(--gold); background:rgba(185,164,131,.13);}
-  .ck.eq{grid-row:span 2; background:linear-gradient(150deg,#cbb894,#ab9670 60%,#7a6a4d); color:#1a1410;
-    border:none; font-size:19px;}
-  .ck.wide{grid-column:span 2;}
-
-  /* ---------- subscriptions ---------- */
-  /* ---------- google search ---------- */
-  .search-bar{display:flex; gap:10px; align-items:center; margin-bottom:12px;}
-  .search-chips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px;}
-  .search-chip{font-size:11.5px; padding:8px 13px; border-radius:99px; cursor:pointer;
-    color:var(--text-1); background:var(--glass); border:1px solid var(--glass-brd);
-    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
-  .search-chip:active{transform:scale(.94); background:rgba(185,164,131,.13); color:var(--text-0);}
-
-  .sr{display:block; padding:15px 16px; margin-bottom:11px; border-radius:20px;
-    text-decoration:none; cursor:pointer;
-    background:linear-gradient(150deg, rgba(185,164,131,.075), rgba(185,164,131,.03) 55%, transparent);
-    border:1px solid var(--glass-brd); border-inline-start:3px solid var(--gold);
-    box-shadow:var(--sh-md);
-    transition:transform var(--dur-fast) var(--ease-spring), border-color var(--dur-mid) var(--ease-soft);}
-  .sr:active{transform:scale(.985); border-color:var(--glass-brd-strong);}
-  .sr-site{font-size:10px; color:var(--text-2); letter-spacing:.6px; margin-bottom:5px;
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .sr-title{font-size:14.5px; font-weight:700; color:#cbb894; line-height:1.45;}
-  .sr-snip{font-size:12px; color:var(--text-1); margin-top:6px; line-height:1.65;}
-  .search-note{padding:16px; border-radius:18px; font-size:12px; line-height:1.9;
-    color:var(--text-1); background:rgba(185,164,131,.05); border:1px solid var(--glass-brd);}
-  .search-note b{color:var(--gold);}
-  .search-note code{font-size:11px; background:rgba(12,10,8,.6); padding:2px 6px; border-radius:6px;
-    direction:ltr; display:inline-block;}
-  .search-spin{text-align:center; padding:30px 0; color:var(--text-2); font-size:13px;}
-
-  /* ---------- calculator ---------- */
-  .calc-fab{position:absolute; top:0; left:0; z-index:60;
+  .calc-fab{position:absolute; top:-52px; left:0; z-index:60;
     width:42px; height:42px; border-radius:50%; cursor:pointer; padding:0;
     display:flex; align-items:center; justify-content:center; color:var(--gold);
     background:linear-gradient(150deg, rgba(185,164,131,.16), rgba(185,164,131,.05));
@@ -1061,6 +994,10 @@
     /* the sidebar already carries the menu and the monogram */
     .topbar{display:none;}
     .hamburger{display:none;}
+    /* no top bar on desktop, so the button sits inside the reserved space */
+    .calc-fab{top:0;}
+    /* the hero starts higher without the top bar — pull the sky down to match */
+    .hero-sky{top:-72px; height:calc(100% + 80px);}
 
     /* the drawer stops being an overlay and lives on the side permanently */
     .drawer-overlay{position:fixed; top:0; bottom:0; inset-inline-end:0; inset-inline-start:auto;
@@ -1222,7 +1159,7 @@
   </div>
 
   <!-- PAGE: FINANCE -->
-  <div class="page" id="page-finance">
+  <div class="page" id="page-finance" style="padding-top:52px;">
     <button class="calc-fab" id="calcFab" aria-label="حاسبة">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
            stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
@@ -2312,7 +2249,7 @@ function buildSkyScene(isNight, cond){
   const VH  = 470;
   const VW  = Math.max(400, Math.round(VH * ((box.width||390) / (box.height||458))));
   const BX  = Math.round(VW * 0.185);   // where the sun/moon sits
-  const BY  = 150;
+  const BY  = 132;
   const heavy   = (cond === 'rain' || cond === 'storm');
   const overcast= (cond === 'cloudy' || cond === 'fog' || heavy);
   const partly  = (cond === 'partly');
@@ -2345,7 +2282,7 @@ function buildSkyScene(isNight, cond){
       for(let i=0;i<L.count;i++){
         let cx, cy;
         do { cx = rand(6, VW-6); cy = rand(8,430); }
-        while((Math.abs(cx-BX) < 78 && Math.abs(cy-BY) < 78) ||
+        while((Math.abs(cx-BX) < 82 && Math.abs(cy-BY) < 82) ||
               (cy > 235 && cy < 285 && cx > VW*0.18 && cx < VW*0.86));
         cx = cx.toFixed(1); cy = cy.toFixed(1);
         const r = rand(L.rMin,L.rMax).toFixed(2);
