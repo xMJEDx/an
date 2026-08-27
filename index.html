@@ -891,6 +891,15 @@
   .drawer-logout{display:flex; align-items:center; gap:10px; padding:12px; border-radius:14px;
     cursor:pointer; font-size:13px; color:#c17a7a; background:rgba(138,51,65,.12);
     border:1px solid rgba(138,51,65,.3);}
+  .drawer-credit{margin-top:16px; padding-top:14px; text-align:center;
+    border-top:1px solid var(--glass-brd);
+    font-size:10px; color:var(--text-2); letter-spacing:1.6px;}
+  .drawer-credit span{font-family:'Cinzel',serif; font-weight:700; letter-spacing:2.4px;
+    background:linear-gradient(90deg, rgba(107,95,77,.9) 0%, var(--gold) 38%, #ece5d7 52%,
+      var(--gold) 66%, rgba(107,95,77,.9) 100%);
+    background-size:280% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:monoSweep 5.5s var(--ease-soft) infinite;}
 
   /* ==========================================================
      RESPONSIVE — iPhone (default) / iPad / Mac
@@ -1277,6 +1286,7 @@
     <div class="drawer-foot">
       <div class="drawer-user" id="drawerUser">—</div>
       <div class="drawer-logout" id="logoutBtn"><span>🔓</span> تسجيل الخروج</div>
+      <div class="drawer-credit">Made by <span>-MJED-</span></div>
     </div>
   </div>
 </div>
@@ -2133,6 +2143,9 @@ function buildSkyScene(isNight, cond){
   const overcast= (cond === 'cloudy' || cond === 'fog' || heavy);
   const partly  = (cond === 'partly');
 
+  const heavySky = heavy;
+  const cloudTop    = heavySky ? '#d5dee8' : '#ffffff';
+  const cloudBottom = heavySky ? '#93a1b0' : '#c8d2de';
   let defs = `
     <radialGradient id="bodyGlow" cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="${isNight ? '#efe9d4' : '#ab9670'}" stop-opacity="${overcast ? 0.18 : 0.38}"/>
@@ -2143,9 +2156,13 @@ function buildSkyScene(isNight, cond){
       <circle cx="58" cy="150" r="24" fill="#fff"/>
       <circle cx="71" cy="141" r="21" fill="#000"/>
     </mask>
-    <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="9"/>
-    </filter>`;
+    <filter id="cloudBlur" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <linearGradient id="cloudFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="${cloudTop}"/>
+      <stop offset="100%" stop-color="${cloudBottom}"/>
+    </linearGradient>`;
 
   /* ---- stars: night only, thinned right down when it's overcast ---- */
   let stars = '';
@@ -2230,29 +2247,42 @@ function buildSkyScene(isNight, cond){
   body += `</g>`;
 
   /* ---- clouds: more of them, and darker, as conditions worsen ---- */
+  // kept high in the frame (y ~85-215) so they sit in the visible part of the
+  // hero rather than down in the area the mask fades out
   const cloudSets = {
-    clear:  [{y:330,rx:56,ry:17,op:.05,dur:58,delay:0}],
-    partly: [{y:330,rx:56,ry:17,op:.09,dur:52,delay:0},
-             {y:280,rx:40,ry:13,op:.07,dur:38,delay:-14},
-             {y:225,rx:32,ry:11,op:.05,dur:46,delay:-22}],
-    cloudy: [{y:300,rx:62,ry:19,op:.15,dur:48,delay:0},
-             {y:250,rx:48,ry:15,op:.13,dur:36,delay:-12},
-             {y:355,rx:54,ry:17,op:.11,dur:60,delay:-28},
-             {y:205,rx:38,ry:13,op:.09,dur:42,delay:-20}],
+    clear:  [{y:175,rx:60,ry:17,op:.34,dur:34,delay:0},
+             {y:240,rx:44,ry:13,op:.26,dur:26,delay:-12}],
+    partly: [{y:168,rx:66,ry:19,op:.52,dur:30,delay:0},
+             {y:222,rx:50,ry:15,op:.44,dur:23,delay:-9},
+             {y:268,rx:38,ry:12,op:.36,dur:27,delay:-16}],
+    cloudy: [{y:162,rx:72,ry:21,op:.70,dur:28,delay:0},
+             {y:210,rx:58,ry:17,op:.62,dur:21,delay:-7},
+             {y:258,rx:64,ry:19,op:.54,dur:34,delay:-17},
+             {y:186,rx:46,ry:14,op:.46,dur:25,delay:-12}],
   };
   cloudSets.fog   = cloudSets.cloudy;
   cloudSets.rain  = cloudSets.cloudy;
   cloudSets.storm = cloudSets.cloudy;
   cloudSets.snow  = cloudSets.cloudy;
-  const cloudTint = heavy ? '#9aa3ad' : '#fff';
-  const clouds = (cloudSets[cond] || cloudSets.clear).map(c=>`
-    <g opacity="${c.op}" filter="url(#cloudBlur)">
+  const clouds = (cloudSets[cond] || cloudSets.clear).map(c=>{
+    const R = c.rx, H = c.ry, Y = c.y;
+    // lobes: [xFactor, yOffsetFactor, radiusFactor]
+    const lobes = [
+      [ 0.00,  0.10, 0.62], [ 0.42, -0.30, 0.52], [-0.40, -0.18, 0.46],
+      [ 0.72,  0.16, 0.38], [-0.70,  0.20, 0.34], [ 0.16, -0.62, 0.38],
+    ];
+    const puffs = lobes.map(([fx, fy, fr])=>
+      `<ellipse cx="${(R*fx).toFixed(1)}" cy="${(Y + H*fy).toFixed(1)}"
+         rx="${(R*fr).toFixed(1)}" ry="${(H*fr*1.5).toFixed(1)}" fill="url(#cloudFill)"/>`).join('');
+    // flat base so it sits like a real cloud rather than floating as circles
+    const base = `<ellipse cx="0" cy="${(Y + H*0.34).toFixed(1)}"
+        rx="${(R*0.92).toFixed(1)}" ry="${(H*0.55).toFixed(1)}" fill="url(#cloudFill)"/>`;
+    return `<g opacity="${c.op}" filter="url(#cloudBlur)">
       <animateTransform attributeName="transform" type="translate"
-        from="${VW+70} 0" to="-140 0" dur="${c.dur}s" begin="${c.delay}s" repeatCount="indefinite"/>
-      <ellipse cx="0" cy="${c.y}" rx="${c.rx}" ry="${c.ry}" fill="${cloudTint}"/>
-      <ellipse cx="${(c.rx*0.55).toFixed(0)}" cy="${(c.y-c.ry*0.45).toFixed(0)}" rx="${(c.rx*0.6).toFixed(0)}" ry="${(c.ry*0.85).toFixed(0)}" fill="${cloudTint}"/>
-      <ellipse cx="${(-c.rx*0.5).toFixed(0)}" cy="${(c.y-c.ry*0.3).toFixed(0)}" rx="${(c.rx*0.5).toFixed(0)}" ry="${(c.ry*0.75).toFixed(0)}" fill="${cloudTint}"/>
-    </g>`).join('');
+        from="${VW+90} 0" to="-170 0" dur="${c.dur}s" begin="${c.delay}s" repeatCount="indefinite"/>
+      ${base}${puffs}
+    </g>`;
+  }).join('');
 
   /* ---- rain ---- */
   let rain = '';
