@@ -117,10 +117,10 @@
     overflow:hidden; contain:paint;
     transition:background 1.4s var(--ease-soft);
     /* soft oval fade on every side — no straight edges anywhere */
-    -webkit-mask-image:radial-gradient(115% 78% at 50% 34%,
-      #000 0%, #000 46%, rgba(0,0,0,.72) 68%, rgba(0,0,0,.28) 86%, transparent 100%);
-    mask-image:radial-gradient(115% 78% at 50% 34%,
-      #000 0%, #000 46%, rgba(0,0,0,.72) 68%, rgba(0,0,0,.28) 86%, transparent 100%);}
+    -webkit-mask-image:radial-gradient(130% 95% at 50% 34%,
+      #000 0%, #000 68%, rgba(0,0,0,.85) 82%, rgba(0,0,0,.4) 93%, transparent 100%);
+    mask-image:radial-gradient(130% 95% at 50% 34%,
+      #000 0%, #000 68%, rgba(0,0,0,.85) 82%, rgba(0,0,0,.4) 93%, transparent 100%);}
   .hero.is-night .hero-sky{background:
     radial-gradient(ellipse 90% 70% at 72% 8%, rgba(74,47,82,.34), transparent 62%),
     radial-gradient(ellipse 80% 60% at 12% 0%, rgba(138,51,65,.16), transparent 60%);}
@@ -129,7 +129,7 @@
     radial-gradient(ellipse 85% 65% at 8% 12%, rgba(168,92,58,.14), transparent 62%);}
   .hero-scene{position:absolute; inset:0; z-index:0; pointer-events:none;
     opacity:0; transition:opacity 1.1s var(--ease-soft);}
-  .hero-scene.in{opacity:.82;}
+  .hero-scene.in{opacity:1;}
   .hero-orb{position:absolute; top:-50px; inset-inline-end:-40px; width:250px; height:250px; border-radius:50%;
     filter:blur(55px); opacity:.3; z-index:0; transition:background 1s ease;}
   .hero-inner{position:relative; z-index:2;}
@@ -2148,7 +2148,7 @@ function buildSkyScene(isNight, cond){
   const cloudBottom = heavySky ? '#93a1b0' : '#c8d2de';
   let defs = `
     <radialGradient id="bodyGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="${isNight ? '#efe9d4' : '#ab9670'}" stop-opacity="${overcast ? 0.18 : 0.38}"/>
+      <stop offset="0%" stop-color="${isNight ? '#fffaf0' : '#d9c08a'}" stop-opacity="${overcast ? 0.32 : 0.62}"/>
       <stop offset="100%" stop-color="${isNight ? '#efe9d4' : '#ab9670'}" stop-opacity="0"/>
     </radialGradient>
     <mask id="moonCut">
@@ -2156,8 +2156,16 @@ function buildSkyScene(isNight, cond){
       <circle cx="58" cy="150" r="24" fill="#fff"/>
       <circle cx="71" cy="141" r="21" fill="#000"/>
     </mask>
+    <filter id="starGlow" x="-260%" y="-260%" width="620%" height="620%">
+      <feGaussianBlur stdDeviation="1.1" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="moonSoft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="1.6" result="g"/>
+      <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
     <filter id="cloudBlur" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="3"/>
+      <feGaussianBlur stdDeviation="2.2"/>
     </filter>
     <linearGradient id="cloudFill" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%"   stop-color="${cloudTop}"/>
@@ -2169,21 +2177,22 @@ function buildSkyScene(isNight, cond){
   if(isNight && !heavy){
     const density = overcast ? 0.25 : (partly ? 0.65 : 1);
     const layers = [
-      { count:Math.round(22*density), rMin:.5,  rMax:.9,  opMax:.45, dMin:5, dMax:9 },
-      { count:Math.round(14*density), rMin:.9,  rMax:1.4, opMax:.75, dMin:4, dMax:7 },
-      { count:Math.round(7*density),  rMin:1.4, rMax:2.0, opMax:1,   dMin:3, dMax:5 },
+      { count:Math.round(28*density), rMin:.7,  rMax:1.1, opMax:.9, dMin:5, dMax:9 },
+      { count:Math.round(17*density), rMin:1.1, rMax:1.6, opMax:1,  dMin:4, dMax:7 },
+      { count:Math.round(9*density),  rMin:1.6, rMax:2.2, opMax:1,  dMin:3, dMax:5 },
     ];
     layers.forEach(L=>{
       for(let i=0;i<L.count;i++){
         let cx, cy;
         do { cx = rand(6, VW-6); cy = rand(8,430); }
-        while(Math.abs(cx-BX) < 78 && Math.abs(cy-BY) < 78);
+        while((Math.abs(cx-BX) < 78 && Math.abs(cy-BY) < 78) ||
+              (cy > 235 && cy < 285 && cx > VW*0.18 && cx < VW*0.86));
         cx = cx.toFixed(1); cy = cy.toFixed(1);
         const r = rand(L.rMin,L.rMax).toFixed(2);
         const dur = rand(L.dMin,L.dMax).toFixed(2);
         const delay = rand(0,dur).toFixed(2);
         const op = rand(L.opMax*0.55, L.opMax).toFixed(2);
-        stars += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" opacity="0">
+        stars += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#fff" opacity="0" filter="url(#starGlow)">
           <animate attributeName="opacity" values="0;${op};${op};0" keyTimes="0;0.25;0.6;1"
             dur="${dur}s" begin="${delay}s" repeatCount="indefinite"
             calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1;0.4 0 0.6 1"/>
@@ -2212,7 +2221,7 @@ function buildSkyScene(isNight, cond){
           keyTimes="0;${(m.delay/m.cycle).toFixed(3)};${((m.delay+0.1)/m.cycle).toFixed(3)};${((m.delay+m.dur*0.75)/m.cycle).toFixed(3)};${((m.delay+m.dur)/m.cycle).toFixed(3)};1"
           dur="${m.cycle}s" repeatCount="indefinite"/>
         <line x1="${m.x1}" y1="${m.y1}" x2="${m.x1}" y2="${m.y1}"
-          stroke="url(#mf${i})" stroke-width="1.6" stroke-linecap="round">
+          stroke="url(#mf${i})" stroke-width="2.6" stroke-linecap="round" filter="url(#starGlow)">
           <animate attributeName="x2" from="${m.x1}" to="${m.x2}" dur="${m.dur}s" begin="${m.delay}s" repeatCount="indefinite"/>
           <animate attributeName="y2" from="${m.y1}" to="${m.y2}" dur="${m.dur}s" begin="${m.delay}s" repeatCount="indefinite"/>
           <animate attributeName="x1" from="${m.x1}" to="${m.x2}" dur="${m.dur}s" begin="${(m.delay+0.28).toFixed(2)}s" repeatCount="indefinite"/>
@@ -2223,13 +2232,13 @@ function buildSkyScene(isNight, cond){
   }
 
   /* ---- sun or moon, dimmed when the sky is covered ---- */
-  const bodyOpacity = heavy ? 0.25 : (overcast ? 0.45 : 1);
+  const bodyOpacity = heavy ? 0.5 : (overcast ? 0.75 : 1);
   let body = `<g opacity="${bodyOpacity}">
     <circle cx="${BX}" cy="${BY}" r="${isNight ? 60 : 58}" fill="url(#bodyGlow)">
       <animate attributeName="opacity" values="0.75;1;0.75" dur="9s" repeatCount="indefinite"/>
     </circle>`;
   if(isNight){
-    body += `<circle cx="${BX}" cy="${BY}" r="24" fill="#efe9d4" mask="url(#moonCut)"/>`;
+    body += `<circle cx="${BX}" cy="${BY}" r="27" fill="#fffdf6" mask="url(#moonCut)" filter="url(#moonSoft)"/>`;
   } else {
     let rays = '';
     if(!overcast){
@@ -2250,15 +2259,15 @@ function buildSkyScene(isNight, cond){
   // kept high in the frame (y ~85-215) so they sit in the visible part of the
   // hero rather than down in the area the mask fades out
   const cloudSets = {
-    clear:  [{y:175,rx:60,ry:17,op:.34,dur:34,delay:0},
-             {y:240,rx:44,ry:13,op:.26,dur:26,delay:-12}],
-    partly: [{y:168,rx:66,ry:19,op:.52,dur:30,delay:0},
-             {y:222,rx:50,ry:15,op:.44,dur:23,delay:-9},
-             {y:268,rx:38,ry:12,op:.36,dur:27,delay:-16}],
-    cloudy: [{y:162,rx:72,ry:21,op:.70,dur:28,delay:0},
-             {y:210,rx:58,ry:17,op:.62,dur:21,delay:-7},
-             {y:258,rx:64,ry:19,op:.54,dur:34,delay:-17},
-             {y:186,rx:46,ry:14,op:.46,dur:25,delay:-12}],
+    clear:  [{y:175,rx:60,ry:17,op:.55,dur:34,delay:0},
+             {y:240,rx:44,ry:13,op:.45,dur:26,delay:-12}],
+    partly: [{y:158,rx:66,ry:19,op:.68,dur:30,delay:0},
+             {y:210,rx:50,ry:15,op:.58,dur:23,delay:-9},
+             {y:252,rx:38,ry:12,op:.48,dur:27,delay:-16}],
+    cloudy: [{y:150,rx:72,ry:21,op:.78,dur:28,delay:0},
+             {y:196,rx:58,ry:17,op:.70,dur:21,delay:-7},
+             {y:242,rx:64,ry:19,op:.60,dur:34,delay:-17},
+             {y:174,rx:46,ry:14,op:.55,dur:25,delay:-12}],
   };
   cloudSets.fog   = cloudSets.cloudy;
   cloudSets.rain  = cloudSets.cloudy;
