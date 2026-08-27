@@ -2326,11 +2326,11 @@ function buildSkyScene(isNight, cond){
   /* ---- sun or moon, dimmed when the sky is covered ---- */
   const bodyOpacity = heavy ? 0.30 : (overcast ? 0.62 : 1);
   let body = `<g opacity="${bodyOpacity}">
-    <circle cx="${BX}" cy="${BY}" r="${isNight ? 74 : 70}" fill="url(#bodyGlow)">
+    <circle cx="${BX}" cy="${BY + (isNight ? 38 : 0)}" r="${isNight ? 74 : 70}" fill="url(#bodyGlow)">
       <animate attributeName="opacity" values="0.75;1;0.75" dur="9s" repeatCount="indefinite"/>
     </circle>`;
   if(isNight){
-    body += `<path d="${crescentPath(BX, BY, 31, 27, -16, -11)}" fill="#ffffff"/>`;
+    body += `<path d="${crescentPath(BX, BY, 31, 27, 0, 17)}" fill="#ffffff"/>`;
   } else {
     let rays = '';
     if(!overcast){
