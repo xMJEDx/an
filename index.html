@@ -1592,18 +1592,22 @@ function sbHeaders(extra){
   }, extra || {});
 }
 function describeHttp(status, body){
-  if(status === 404) return 'الجدول vault غير موجود — نفّذ أمر SQL في Supabase';
+  if(status === 404) return 'دوال vault غير موجودة — نفّذ أمر SQL في Supabase';
   if(status === 401) return 'المفتاح مرفوض (401) — تأكد من Publishable key';
-  if(status === 403) return 'الصلاحيات مرفوضة (403) — نفّذ أوامر RLS في SQL';
-  if(status === 400 && /relation|does not exist/i.test(body||''))
-    return 'الجدول vault غير موجود — نفّذ أمر SQL في Supabase';
+  if(status === 403) return 'الصلاحيات مرفوضة (403) — نفّذ أوامر grant في SQL';
+  if(status === 400 && /function|relation|does not exist|schema cache/i.test(body||''))
+    return 'دوال vault غير موجودة — نفّذ أمر SQL في Supabase';
   return `خطأ من الخادم (${status})`;
 }
 async function cloudGet(){
   let r;
   try{
-    r = await fetch(`${SB_URL}/rest/v1/vault?id=eq.${rowId}&select=data,updated_at`,
-      { headers: sbHeaders(), cache:'no-store' });
+    // goes through a locked-down function: the table itself is not readable,
+    // so nobody can list rows or discover anyone else's id
+    r = await fetch(`${SB_URL}/rest/v1/rpc/vault_get`, {
+      method:'POST', headers: sbHeaders(), cache:'no-store',
+      body: JSON.stringify({ p_id: rowId })
+    });
   }catch(netErr){
     const e = new Error('لا يوجد اتصال بالإنترنت (أو حجب CORS)');
     e.kind = 'network'; throw e;
@@ -1615,16 +1619,14 @@ async function cloudGet(){
     throw e;
   }
   const rows = await r.json();
-  return rows && rows[0] ? rows[0] : null;
+  return Array.isArray(rows) && rows[0] ? rows[0] : null;
 }
 async function cloudPut(cipher){
   let r;
-  const stamp = new Date().toISOString();
   try{
-    r = await fetch(`${SB_URL}/rest/v1/vault`, {
-      method: 'POST',
-      headers: sbHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
-      body: JSON.stringify({ id: rowId, data: cipher, updated_at: stamp })
+    r = await fetch(`${SB_URL}/rest/v1/rpc/vault_put`, {
+      method: 'POST', headers: sbHeaders(),
+      body: JSON.stringify({ p_id: rowId, p_data: cipher })
     });
   }catch(netErr){
     const e = new Error('لا يوجد اتصال بالإنترنت'); e.kind='network'; throw e;
@@ -1635,7 +1637,9 @@ async function cloudPut(cipher){
     e.kind='http'; e.status=r.status; e.body=body;
     throw e;
   }
-  return stamp;
+  // the function returns the timestamp it stored
+  const ts = await r.json().catch(()=> null);
+  return (typeof ts === 'string' ? ts : new Date().toISOString());
 }
 
 /* ---- status pill ---- */
