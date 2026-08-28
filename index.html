@@ -562,6 +562,7 @@
   .acc-name{font-size:14.5px; font-weight:700;}
   .acc-bal{font-size:12px; color:var(--text-2); margin-top:2px; font-variant-numeric:tabular-nums;}
   .acc-arrow{color:var(--text-2); font-size:14px;}
+  .acc-edit{flex:0 0 auto; margin-inline-end:4px;}
 
   /* ---------- calculator ---------- */
   .calc-fab{position:absolute; top:-52px; left:0; z-index:60;
@@ -1427,13 +1428,14 @@
 <!-- ACCOUNT MODAL -->
 <div class="modal-overlay" id="accModal">
   <div class="modal-card">
-    <div class="modal-title">حساب بنكي جديد</div>
+    <div class="modal-title" id="accModalTitle">حساب بنكي جديد</div>
     <input class="add-input" id="modalAccName" placeholder="اسم الحساب... مثلاً الراجحي" />
     <input class="add-input" id="modalAccBal" placeholder="المبلغ الحالي" inputmode="decimal" />
     <div class="modal-actions">
       <button class="modal-btn cancel" id="accModalCancel">إلغاء</button>
       <button class="modal-btn save" id="accModalSave">حفظ</button>
     </div>
+    <button class="modal-btn danger" id="accModalDelete" style="display:none;">حذف الحساب 🗑️</button>
   </div>
 </div>
 
@@ -2326,11 +2328,11 @@ function buildSkyScene(isNight, cond){
   /* ---- sun or moon, dimmed when the sky is covered ---- */
   const bodyOpacity = heavy ? 0.30 : (overcast ? 0.62 : 1);
   let body = `<g opacity="${bodyOpacity}">
-    <circle cx="${BX}" cy="${BY + (isNight ? 38 : 0)}" r="${isNight ? 74 : 70}" fill="url(#bodyGlow)">
+    <circle cx="${BX + (isNight ? -38 : 0)}" cy="${BY + (isNight ? -21 : 0)}" r="${isNight ? 74 : 70}" fill="url(#bodyGlow)">
       <animate attributeName="opacity" values="0.75;1;0.75" dur="9s" repeatCount="indefinite"/>
     </circle>`;
   if(isNight){
-    body += `<path d="${crescentPath(BX, BY, 31, 27, 0, 17)}" fill="#ffffff"/>`;
+    body += `<path d="${crescentPath(BX, BY, 31, 27, -16, -9)}" fill="#ffffff"/>`;
   } else {
     let rays = '';
     if(!overcast){
@@ -3163,25 +3165,68 @@ function renderAccounts(){
     card.innerHTML = `
       <div class="acc-ic">🏦</div>
       <div class="acc-mid"><div class="acc-name">${esc(acc.name)}</div><div class="acc-bal">${acc.balance.toLocaleString('ar')} ريال</div></div>
+      <button class="tbtn acc-edit" data-id="${acc.id}" aria-label="تعديل">✎</button>
       <div class="acc-arrow">‹</div>`;
-    card.addEventListener('click', ()=> openAccountDetail(acc.id));
+    card.addEventListener('click', e=>{
+      if(e.target.closest('.acc-edit')) return;
+      openAccountDetail(acc.id);
+    });
     wrap.appendChild(card);
+  });
+  wrap.querySelectorAll('.acc-edit').forEach(btn=>{
+    btn.addEventListener('click', e=>{ e.stopPropagation(); openAccModal('edit', btn.dataset.id); });
   });
   document.getElementById('addAccBtn').style.display = accounts.length>=10 ? 'none' : 'block';
 }
-document.getElementById('addAccBtn').addEventListener('click', ()=>{
-  document.getElementById('modalAccName').value='';
-  document.getElementById('modalAccBal').value='';
+let accModalMode = 'add', editingAccId = null;
+function openAccModal(mode, id){
+  accModalMode = mode; editingAccId = id || null;
+  if(mode === 'edit'){
+    const a = accounts.find(x=>x.id===id);
+    document.getElementById('accModalTitle').textContent = 'تعديل الحساب';
+    document.getElementById('modalAccName').value = a.name;
+    document.getElementById('modalAccBal').value  = a.balance;
+  } else {
+    document.getElementById('accModalTitle').textContent = 'حساب بنكي جديد';
+    document.getElementById('modalAccName').value = '';
+    document.getElementById('modalAccBal').value  = '';
+  }
+  document.getElementById('accModalDelete').style.display = (mode==='edit') ? 'block' : 'none';
   document.getElementById('accModal').classList.add('show');
-});
+}
+document.getElementById('addAccBtn').addEventListener('click', ()=> openAccModal('add'));
 document.getElementById('accModalCancel').addEventListener('click', ()=> document.getElementById('accModal').classList.remove('show'));
 document.getElementById('accModal').addEventListener('click', e=>{ if(e.target.id==='accModal') document.getElementById('accModal').classList.remove('show'); });
 document.getElementById('accModalSave').addEventListener('click', ()=>{
   const name = document.getElementById('modalAccName').value.trim();
-  const bal = parseFloat(document.getElementById('modalAccBal').value) || 0;
-  if(!name || accounts.length>=10) return;
-  accounts.push({ id: Date.now().toString(), name, balance: bal });
+  const bal  = parseFloat(document.getElementById('modalAccBal').value) || 0;
+  if(!name) return;
+  if(accModalMode === 'edit'){
+    const a = accounts.find(x=>x.id===editingAccId);
+    if(a){ a.name = name; a.balance = bal; }
+  } else {
+    if(accounts.length>=10) return;
+    accounts.push({ id: Date.now().toString(), name, balance: bal });
+  }
   store.set('finAccounts', accounts);
+  document.getElementById('accModal').classList.remove('show');
+  renderAccounts();
+});
+
+document.getElementById('accModalDelete').addEventListener('click', async ()=>{
+  const a = accounts.find(x=>x.id===editingAccId);
+  if(!a) return;
+  const txCount = (txData[editingAccId] || []).length;
+  const msg = txCount
+    ? `سيتم حذف "${a.name}" مع ${txCount} عملية مسجّلة عليه. لا يمكن التراجع.`
+    : `سيتم حذف حساب "${a.name}".`;
+  if(!await askConfirm(msg, { title:'حذف حساب', yes:'حذف' })) return;
+  accounts = accounts.filter(x=>x.id!==editingAccId);
+  delete txData[editingAccId];
+  store.set('finAccounts', accounts);
+  store.set('finTx', txData);
+  if(activeAccId === editingAccId){ activeAccId = null; backToAccounts(); }
+  editingAccId = null;
   document.getElementById('accModal').classList.remove('show');
   renderAccounts();
 });
