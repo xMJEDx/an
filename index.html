@@ -682,6 +682,15 @@
     transition:transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) var(--ease-soft);}
   .tx-del:active{transform:scale(.85); color:#c17a7a;}
 
+  /* ---------- backup ---------- */
+  .backup-box{padding:16px; border-radius:20px; margin-bottom:20px;
+    background:linear-gradient(160deg, rgba(185,164,131,.08), rgba(185,164,131,.025) 62%, transparent);
+    border:1px solid var(--glass-brd);}
+  .backup-note{font-size:11.5px; color:var(--text-1); line-height:1.85;}
+  .backup-meta{font-size:10.5px; color:var(--text-2); margin-top:10px; letter-spacing:.3px;}
+  .backup-btns{display:flex; gap:9px; margin-top:14px;}
+  .backup-btns .modal-btn{flex:1; font-size:12.5px;}
+
   /* ---------- summary page ---------- */
   .cmp-head{font-size:10px; color:var(--gold); font-weight:700; letter-spacing:1.4px;
     margin:20px 2px 10px;}
@@ -1068,6 +1077,13 @@
   .purch-item.done .purch-check svg path{stroke:#f2ead9; stroke-dashoffset:0;}
   .purch-group{font-size:10px; color:var(--gold); font-weight:700; letter-spacing:1.4px;
     margin:16px 2px 9px;}
+  .purch-group.has-clear{display:flex; align-items:center; justify-content:space-between; gap:10px;
+    grid-column:1 / -1;}
+  .purch-clear{padding:7px 13px; border-radius:99px; cursor:pointer; font-family:inherit;
+    font-size:10px; font-weight:700; letter-spacing:.3px; color:#d9a3a3;
+    background:rgba(138,51,65,.16); border:1px solid rgba(138,51,65,.34);
+    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-fast) var(--ease-soft);}
+  .purch-clear:active{transform:scale(.93); background:rgba(138,51,65,.3);}
 
   /* ---------- notes ---------- */
   .note-toolbar{display:flex; flex-direction:column; gap:8px; padding:12px 13px; margin-bottom:11px;
@@ -1482,7 +1498,7 @@
     <div id="subListView">
       <div class="section-head" style="margin-top:0;">
         <div class="section-title">الاشتراكات</div>
-        <div class="section-sub" id="subCount">0/15</div>
+        <div class="section-sub" id="subCount">0/30</div>
       </div>
       <div class="sub-summary">
         <div class="sub-sum-item">
@@ -1575,6 +1591,20 @@
 
     <div id="sumCompare"></div>
     <div id="sumWeeks"></div>
+
+    <div class="cmp-head">النسخة الاحتياطية</div>
+    <div class="backup-box">
+      <div class="backup-note">
+        بياناتك مزامَنة ومشفّرة، لكن فك التشفير يعتمد على كلمة سرك وحدها.
+        احفظ نسخة على جهازك من وقت لآخر كشبكة أمان.
+      </div>
+      <div class="backup-meta" id="backupMeta">—</div>
+      <div class="backup-btns">
+        <button class="modal-btn save" id="backupExport">⬇︎ حفظ نسخة</button>
+        <button class="modal-btn cancel" id="backupImport">⬆︎ استعادة</button>
+      </div>
+      <input type="file" id="backupFile" accept="application/json,.json" style="display:none;" />
+    </div>
   </div>
 
   <!-- PAGE: NOTES -->
@@ -2979,6 +3009,89 @@ function closeTaskModal(){ document.getElementById('taskModal').classList.remove
 document.getElementById('addTaskBtn').addEventListener('click', ()=> openTaskModal('add'));
 document.getElementById('taskModalCancel').addEventListener('click', closeTaskModal);
 document.getElementById('taskModal').addEventListener('click', e=>{ if(e.target.id==='taskModal') closeTaskModal(); });
+/* ---- manual backup ----
+   Writes a plain JSON file of everything the app stores, so there is a copy
+   that does not depend on remembering the password. */
+function backupPayload(){
+  const data = collectData();          // already excludes session/local-only keys
+  return {
+    app: 'yawmi', version: 1,
+    exportedAt: new Date().toISOString(),
+    user: authUser || null,
+    counts: {
+      goals:        (store.get('goals', []) || []).length,
+      purchases:    (store.get('purchases', []) || []).length,
+      subscriptions:(store.get('subscriptions', []) || []).length,
+      accounts:     (store.get('finAccounts', []) || []).length,
+      notes:        (store.get('savedNotes', []) || []).length,
+      gymDays:      Object.keys(store.get('gymLog', {}) || {}).length,
+    },
+    data
+  };
+}
+function refreshBackupMeta(){
+  const el = document.getElementById('backupMeta');
+  if(!el) return;
+  const last = store.get('lastBackup', null);
+  const c = backupPayload().counts;
+  const bits = [`${c.accounts} حساب`, `${c.subscriptions} اشتراك`,
+                `${c.goals} هدف`, `${c.gymDays} يوم نادي`];
+  el.textContent = (last ? `آخر نسخة: ${last} · ` : 'ما حفظت نسخة بعد · ') + bits.join(' · ');
+}
+document.getElementById('backupExport').addEventListener('click', ()=>{
+  try{
+    const payload = backupPayload();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `يومي-نسخة-${todayKey}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 4000);
+    const d = new Date();
+    store.set('lastBackup', `${d.getDate()} ${arMonths[d.getMonth()]} ${d.getFullYear()}`);
+    buzz(); showToast('تم حفظ النسخة ⬇︎');
+    refreshBackupMeta();
+  }catch(e){ showToast('تعذّر حفظ النسخة', { top:true, ms:3000 }); }
+});
+document.getElementById('backupImport').addEventListener('click', ()=>
+  document.getElementById('backupFile').click());
+document.getElementById('backupFile').addEventListener('change', async e=>{
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  let payload;
+  try{ payload = JSON.parse(await file.text()); }
+  catch(err){ return showToast('الملف غير صالح', { top:true, ms:3000 }); }
+  if(!payload || payload.app !== 'yawmi' || !payload.data)
+    return showToast('هذا الملف ليس نسخة من يومي', { top:true, ms:3500 });
+
+  const c = payload.counts || {};
+  const when = payload.exportedAt ? payload.exportedAt.slice(0,10) : 'غير معروف';
+  const ok = await askConfirm(
+    `النسخة بتاريخ ${when} وتحتوي ${c.accounts||0} حساب و${c.subscriptions||0} اشتراك و${c.goals||0} هدف.\n\n`
+    + 'سيتم استبدال بياناتك الحالية على هذا الجهاز بالكامل.',
+    { title:'استعادة نسخة', yes:'استعادة' });
+  if(!ok) return;
+
+  // replace everything that syncs, then mark it all as freshly changed
+  applyingRemote = true;
+  try{
+    for(let i = localStorage.length - 1; i >= 0; i--){
+      const k = localStorage.key(i);
+      if(k && SYNCED_KEY(k)) localStorage.removeItem(k);
+    }
+    Object.entries(payload.data).forEach(([k, v])=> localStorage.setItem(k, v));
+    const now = Date.now(), meta = {};
+    Object.keys(payload.data).forEach(k=> meta[k] = now);
+    setMeta(meta);
+  } finally { applyingRemote = false; }
+
+  showToast('تمت الاستعادة — يعاد التحميل…');
+  if(typeof queueSync === 'function') queueSync();
+  setTimeout(()=> location.reload(), 1200);
+});
+
 /* ---- summary page ----
    Stats for any window of days, plus a comparison against the previous
    window of the same length, and a week-by-week breakdown. */
@@ -3135,6 +3248,7 @@ function renderSummary(){
   }
   document.getElementById('sumWeeks').innerHTML =
     `<div class="cmp-head">أسبوعاً بأسبوع</div>` + rows;
+  refreshBackupMeta();
 }
 
 /* ---- swipe a card sideways to delete it ---- */
@@ -4802,7 +4916,7 @@ function subColor(sub){
 
 /* ---- list view ---- */
 function renderSubs(){
-  document.getElementById('subCount').textContent = `${subscriptions.length}/15`;
+  document.getElementById('subCount').textContent = `${subscriptions.length}/30`;
   const fmt = n => Math.round(n).toLocaleString('en-US');
 
   const totalMonthly = subscriptions.reduce((s,x)=> s + monthlyCost(x), 0);
@@ -4864,7 +4978,7 @@ function renderSubs(){
     });
   });
 
-  document.getElementById('addSubBtn').style.display = subscriptions.length>=15 ? 'none' : 'block';
+  document.getElementById('addSubBtn').style.display = subscriptions.length>=30 ? 'none' : 'block';
 }
 
 /* ---- detail view: full payment history ---- */
@@ -5054,7 +5168,7 @@ document.getElementById('subModalSave').addEventListener('click', ()=>{
     const sub = subscriptions.find(s=>s.id===editingSubId);
     Object.assign(sub, fields, { name, startDate });
   } else {
-    if(subscriptions.length>=15) return;
+    if(subscriptions.length>=30) return;
     subscriptions.push(Object.assign(
       { id: Date.now().toString(), name, startDate, paid:{} }, fields));
   }
@@ -5418,8 +5532,20 @@ function renderPurchases(){
 
   if(bought.length && purchFilter === 'all'){
     const h = document.createElement('div');
-    h.className = 'purch-group';
-    h.textContent = `تم شراؤه (${bought.length})`;
+    h.className = 'purch-group has-clear';
+    h.innerHTML = `<span>تم شراؤه (${bought.length})</span>`;
+    const clr = document.createElement('button');
+    clr.className = 'purch-clear';
+    clr.textContent = 'مسح الكل 🗑️';
+    clr.addEventListener('click', async ()=>{
+      if(!await askConfirm(`سيتم حذف ${bought.length} مشترى تم شراؤها. لا يمكن التراجع.`,
+          { title:'مسح المشتراة', yes:'مسح' })) return;
+      purchases = purchases.filter(x=>!x.done);
+      store.set('purchases', purchases);
+      buzz(); showToast('تم مسح المشتراة ✓');
+      renderPurchases();
+    });
+    h.appendChild(clr);
     wrap.appendChild(h);
     bought.slice().reverse().forEach(p=> wrap.appendChild(card(p)));
   }
