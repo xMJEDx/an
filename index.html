@@ -682,6 +682,50 @@
     transition:transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) var(--ease-soft);}
   .tx-del:active{transform:scale(.85); color:#c17a7a;}
 
+  /* ---------- voice / text commands ---------- */
+  .cmd-fab{position:fixed; z-index:80; right:16px;
+    bottom:calc(18px + env(safe-area-inset-bottom));
+    width:54px; height:54px; border-radius:50%; cursor:pointer; padding:0;
+    display:flex; align-items:center; justify-content:center; color:#1a1410;
+    background:linear-gradient(150deg,#e0d0ac,#cbb894 55%,#ab9670);
+    border:none; box-shadow:0 12px 30px -10px rgba(185,164,131,.7), var(--sh-md);
+    transition:transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-mid) var(--ease-soft);}
+  .cmd-fab:active{transform:scale(.88);}
+
+  .cmd-mic{position:relative; width:84px; height:84px; margin:6px auto 12px; cursor:pointer;
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(150deg, rgba(185,164,131,.18), rgba(185,164,131,.05));
+    border:1px solid var(--glass-brd-strong);
+    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-mid) var(--ease-soft);}
+  .cmd-mic:active{transform:scale(.92);}
+  .cmd-mic-ic{font-size:32px; line-height:1;}
+  .cmd-mic-ring{position:absolute; inset:-6px; border-radius:50%; opacity:0;
+    border:2px solid var(--gold);}
+  .cmd-mic.listening{background:linear-gradient(150deg, rgba(138,51,65,.3), rgba(138,51,65,.1));
+    border-color:rgba(138,51,65,.6);}
+  .cmd-mic.listening .cmd-mic-ring{opacity:1; animation:micPulse 1.4s var(--ease-soft) infinite;}
+  @keyframes micPulse{
+    0%{transform:scale(1); opacity:.8;}
+    100%{transform:scale(1.35); opacity:0;}
+  }
+  .cmd-state{text-align:center; font-size:11.5px; color:var(--text-2); margin-bottom:12px; min-height:16px;}
+  .cmd-state.err{color:#d99;}
+
+  .cmd-preview{margin-top:12px; padding:14px; border-radius:18px;
+    background:linear-gradient(150deg, rgba(185,164,131,.12), rgba(185,164,131,.03) 62%, transparent);
+    border:1px solid var(--glass-brd-strong);}
+  .cmd-pv-head{font-size:9.5px; color:var(--text-2); letter-spacing:1.4px; font-weight:700;}
+  .cmd-pv-main{font-size:14.5px; font-weight:700; color:var(--text-0); margin-top:6px; line-height:1.5;}
+  .cmd-pv-sub{font-size:11.5px; color:var(--text-1); margin-top:5px; line-height:1.6;}
+  .cmd-preview.bad{border-color:rgba(138,51,65,.5);
+    background:linear-gradient(150deg, rgba(138,51,65,.16), transparent 62%);}
+
+  .cmd-hints{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px;}
+  .cmd-hint{font-size:10.5px; padding:7px 11px; border-radius:99px; cursor:pointer;
+    color:var(--text-2); background:var(--glass); border:1px solid var(--glass-brd);
+    transition:transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) var(--ease-soft);}
+  .cmd-hint:active{transform:scale(.93); color:var(--text-0);}
+
   /* ---------- backup ---------- */
   .backup-box{padding:16px; border-radius:20px; margin-bottom:20px;
     background:linear-gradient(160deg, rgba(185,164,131,.08), rgba(185,164,131,.025) 62%, transparent);
@@ -1302,6 +1346,38 @@
     <div class="lock-note">
       🔐 كلمة السر ما تُرسل ولا تُحفظ في أي مكان — تُستخدم على جهازك فقط لفك تشفير بياناتك.
       لو نسيتها ما فيه طريقة لاستعادتها.
+    </div>
+  </div>
+</div>
+
+<button class="cmd-fab" id="cmdFab" aria-label="أمر صوتي">
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+       stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="9" y="2.5" width="6" height="11" rx="3"/>
+    <path d="M5.5 11a6.5 6.5 0 0 0 13 0"/>
+    <line x1="12" y1="17.5" x2="12" y2="21"/>
+  </svg>
+</button>
+
+<div class="modal-overlay" id="cmdModal">
+  <div class="modal-card">
+    <div class="modal-title">وش تبي أسوي؟</div>
+
+    <div class="cmd-mic" id="cmdMic">
+      <div class="cmd-mic-ring"></div>
+      <div class="cmd-mic-ic">🎙️</div>
+    </div>
+    <div class="cmd-state" id="cmdState">اضغط الميكروفون أو اكتب أمرك</div>
+
+    <input class="add-input" id="cmdInput" placeholder="مثال: اخصم من الراجحي ٢٠ عشا" />
+
+    <div class="cmd-preview" id="cmdPreview" style="display:none;"></div>
+
+    <div class="cmd-hints" id="cmdHints"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="cmdCancel">إغلاق</button>
+      <button class="modal-btn save" id="cmdRun">تنفيذ</button>
     </div>
   </div>
 </div>
@@ -3009,6 +3085,397 @@ function closeTaskModal(){ document.getElementById('taskModal').classList.remove
 document.getElementById('addTaskBtn').addEventListener('click', ()=> openTaskModal('add'));
 document.getElementById('taskModalCancel').addEventListener('click', closeTaskModal);
 document.getElementById('taskModal').addEventListener('click', e=>{ if(e.target.id==='taskModal') closeTaskModal(); });
+/* ==================================================================
+   COMMANDS — understands short Arabic instructions and carries them out.
+   This is pattern matching, not a language model: it recognises a set of
+   verbs and matches names against things you already created.
+   ================================================================== */
+
+/* strip diacritics, unify alef/ya/ta forms, convert Arabic-Indic digits */
+function normAr(t){
+  return String(t || '')
+    .replace(/[\u064B-\u0652\u0640]/g, '')
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+    .replace(/[إأآا]/g, 'ا').replace(/[ىي]/g, 'ي').replace(/ة/g, 'ه')
+    .replace(/\s+/g, ' ')
+    .trim().toLowerCase();
+}
+/* spelled-out numbers people actually say */
+const AR_WORD_NUM = {
+  'صفر':0,'وحده':1,'واحد':1,'اثنين':2,'ثنين':2,'ثلاثه':3,'ثلاث':3,'اربعه':4,'اربع':4,
+  'خمسه':5,'خمس':5,'سته':6,'ست':6,'سبعه':7,'سبع':7,'ثمانيه':8,'ثمان':8,'تسعه':9,'تسع':9,
+  'عشره':10,'عشر':10,'عشرين':20,'ثلاثين':30,'اربعين':40,'خمسين':50,'ستين':60,
+  'سبعين':70,'ثمانين':80,'تسعين':90,'مايه':100,'مئه':100,'ميه':100,'مئتين':200,'الف':1000,'ميتين':200,'الفين':2000,'خمسمايه':500,'خمسميه':500,
+};
+function extractNumber(text){
+  const m = text.match(/\d+(?:[.,]\d+)?/);
+  if(m) return parseFloat(m[0].replace(',', '.'));
+  // spelled out: take the longest match so "ميتين" wins over "مية"
+  let best = null, bestLen = 0;
+  for(const w in AR_WORD_NUM){
+    if(w.length > bestLen && new RegExp('(^|\\s)' + w + '($|\\s)').test(text)){
+      best = AR_WORD_NUM[w]; bestLen = w.length;
+    }
+  }
+  return best;
+}
+/* Latin names are often spoken in Arabic letters, so map the sounds across
+   and compare loosely. Good enough for "نتفلكس" -> "netflix". */
+const AR2LAT = { 'ا':'a','ب':'b','ت':'t','ث':'th','ج':'j','ح':'h','خ':'kh','د':'d','ذ':'th',
+  'ر':'r','ز':'z','س':'s','ش':'sh','ص':'s','ض':'d','ط':'t','ظ':'z','ع':'a','غ':'g',
+  'ف':'f','ق':'k','ك':'k','ل':'l','م':'m','ن':'n','ه':'h','و':'w','ي':'y','ء':'' };
+function arToLatin(w){
+  return String(w).split('').map(ch => AR2LAT[ch] !== undefined ? AR2LAT[ch] : ch).join('');
+}
+const squeeze = w => String(w).toLowerCase()
+  .replace(/x/g,'ks').replace(/ph/g,'f').replace(/ck/g,'k')
+  .replace(/c/g,'k').replace(/q/g,'k').replace(/z/g,'s')
+  .replace(/(.)\1+/g,'$1')                 // collapse doubles
+  .replace(/[aeiouwy\s_'-]/g,'');
+function soundsLike(arabicWord, latinName){
+  const a = squeeze(arToLatin(arabicWord));
+  const b = squeeze(latinName);
+  if(!a || !b || a.length < 3) return false;
+  return a === b || a.includes(b) || b.includes(a);
+}
+
+/* best match of a name inside the sentence, from a list the user created */
+function matchNamed(text, items, getName){
+  let best = null, bestLen = 0;
+  const spoken = text.split(' ').filter(w=>w.length >= 3);
+  items.forEach(it=>{
+    const raw  = getName(it) || '';
+    const name = normAr(raw);
+    if(!name) return;
+    const words = name.split(' ').filter(w=>w.length > 1);
+    let hit = text.includes(name);
+    if(!hit && words.length) hit = words.some(w=> text.includes(w) && w.length >= 3);
+    // a Latin name said in Arabic letters
+    if(!hit && /[a-z]/i.test(raw)) hit = spoken.some(w=> soundsLike(w, raw));
+    if(hit && name.length >= bestLen){ best = it; bestLen = name.length; }
+  });
+  return best;
+}
+const CAT_WORDS = {
+  food:['عشا','غدا','فطور','اكل','مطعم','قهوه','كافيه','وجبه','برجر','بقاله','سوبرماركت'],
+  fuel:['بنزين','وقود','محطه','تعبئه','بترول'],
+  shopping:['ملابس','تسوق','شرا','شريت','متجر','ساعه','جوال','حذا'],
+  bills:['فاتوره','كهربا','ماي','نت','اشتراك','ايجار','رسوم'],
+  fun:['سينما','لعبه','ترفيه','رحله','قهوه مع','خروج'],
+};
+function guessCat(text){
+  for(const key in CAT_WORDS){
+    if(CAT_WORDS[key].some(w=> text.includes(w))) return key;
+  }
+  return 'other';
+}
+
+/* Normalising strips hamza and ta-marbuta, which is right for matching but
+   wrong for storing. Recover the user's own spelling of the kept words. */
+function keepOriginal(original, normalized){
+  if(!normalized) return normalized;
+  const want = normalized.split(' ').filter(Boolean);
+  const outWords = String(original).split(/\s+/).filter(w=>{
+    const n = normAr(w);
+    return want.some(x => n === x || n.includes(x) || x.includes(n));
+  });
+  const joined = outWords.join(' ').trim();
+  return joined || normalized;
+}
+
+/* ---- turn a sentence into a described action ---- */
+function parseCommand(raw){
+  const original = String(raw || '').trim();
+  const t = normAr(raw);
+  if(!t) return { ok:false, why:'ما سمعت شي' };
+  const num = extractNumber(t);
+
+  const has = (...words) => words.some(w => t.includes(w));
+
+  /* ---------- gym ---------- */
+  if(has('سجل','تمرين','تمرن','رفعت','وزن','كيلو','كجم','خطوه','خطوات') &&
+     !has('اخصم','صرفت','ادفع','دفعت','ايداع')){
+    // which muscle?
+    let group = null;
+    const GW = { chest:['صدر','بنش'], back:['ظهر','سحب'], shoulder:['كتف','كتوف'],
+                 bicep:['باي','بايسبس','عضله اماميه'], tricep:['تراي','ترايسبس'],
+                 steps:['خطوه','خطوات','مشي'] };
+    for(const g in GW){ if(GW[g].some(w=> t.includes(w))){ group = g; break; } }
+    // which exercise? search that group's library, else all
+    let ex = null;
+    if(group) ex = matchNamed(t, gymLibrary[group] || [], x=>x.label);
+    if(!ex){
+      for(const g in gymLibrary){
+        const hit = matchNamed(t, gymLibrary[g] || [], x=>x.label);
+        if(hit){ ex = hit; group = g; break; }
+      }
+    }
+    if(num == null) return { ok:false, why:'ما فهمت الرقم' };
+    if(!group)      return { ok:false, why:'ما عرفت أي عضلة' };
+
+    if(!ex){
+      // a name we have not seen: take the words that are not command words
+      const strip = ['سجل','تمرين','تمرن','رفعت','وزن','كيلو','كجم','في','على','بـ','ب',
+                     'صدر','ظهر','كتف','باي','تراي','خطوه','خطوات','مشي','اليوم'];
+      let name = t.replace(/\d+(?:[.,]\d+)?/g,' ');
+      strip.forEach(w=> name = name.replace(new RegExp('(^|\\s)'+w+'($|\\s)','g'), ' '));
+      name = name.replace(/\s+/g,' ').trim();
+      name = keepOriginal(original, name);
+      return { ok:true, kind:'gymNew', group, name: name || 'تمرين جديد', value:num,
+        title:`تسجيل ${num} ${unitOf(group)} على تمرين جديد`,
+        sub:`${GYM_GROUPS[group].label} · "${name || 'تمرين جديد'}" — بيُضاف لقائمة تمارينك` };
+    }
+    return { ok:true, kind:'gym', group, exKey:ex.key, value:num,
+      title:`${ex.label} — ${num} ${unitOf(group)}`,
+      sub:`${GYM_GROUPS[group].label} · اليوم` };
+  }
+
+  /* ---------- money ---------- */
+  /* subscriptions first: "دفعت اشتراك نتفلكس" has no amount in the words */
+  if(has('اشتراك','جدد') || (has('دفعت','ادفع') && matchNamed(t, subscriptions, x=>x.name))){
+    const sub = matchNamed(t, subscriptions, x=>x.name);
+    if(sub){
+      const st = subStatus(sub);
+      return { ok:true, kind:'subPay', subId:sub.id,
+        title:`تعليم ${sub.name} كمدفوع`,
+        sub:`${sub.amount} ريال · ${periodLabel(sub, st.index)} — بيسألك من أي حساب` };
+    }
+  }
+
+  const moneyVerb = has('اخصم','خصم','صرفت','صرف','ادفع','دفعت','اشتريت','نزل من',
+                        'ايداع','ودعت','استلمت','راتب','دخل') ||
+                    (has('اضف') && has('ريال','حساب','راتب','رصيد'));
+  if(moneyVerb){
+    const income = has('ايداع','راتب','دخل','ودعت','استلمت');
+    let acc = matchNamed(t, accounts, a=>a.name);
+    // "الراجحي" written as "راجحي", and a single account needs no naming
+    if(!acc) acc = accounts.find(a=> t.includes(normAr(a.name).replace(/^ال/, '')));
+    if(!acc && accounts.length === 1) acc = accounts[0];
+    // no name given: use the account with the most activity as the default
+    if(!acc && accounts.length > 1){
+      let top = null, most = -1;
+      accounts.forEach(a=>{
+        const n = (txData[a.id] || []).length;
+        if(n > most){ most = n; top = a; }
+      });
+      acc = top; if(acc) var assumedAcc = true;
+    }
+    if(num == null) return { ok:false, why:'ما فهمت المبلغ' };
+    if(!acc) return { ok:false, why: accounts.length ? 'ما عرفت أي حساب' : 'ما عندك حسابات بعد' };
+    const cat = income ? null : guessCat(t);
+    // note = leftover words
+    const strip = ['اخصم','خصم','صرفت','صرف','ادفع','دفعت','اشتريت','من','على','حساب',
+                   'ريال','ايداع','اضف','ودعت','استلمت','في','الى','لـ','ل'];
+    let note = t.replace(/\d+(?:[.,]\d+)?/g,' ').replace(normAr(acc.name),' ');
+    strip.forEach(w=> note = note.replace(new RegExp('(^|\\s)'+w+'($|\\s)','g'), ' '));
+    note = note.replace(/\s+/g,' ').trim();
+    return { ok:true, kind:'money', accId:acc.id, amount:num, income, cat, note,
+      title:`${income ? 'إيداع' : 'خصم'} ${num.toLocaleString('en-US')} ريال ${income ? 'في' : 'من'} ${acc.name}${typeof assumedAcc !== 'undefined' && assumedAcc ? ' (افتراضي)' : ''}`,
+      sub:`${income ? '' : (TX_CATS[cat] ? TX_CATS[cat].icon + ' ' + TX_CATS[cat].label + ' · ' : '')}${note || 'بدون ملاحظة'} · الرصيد بعدها ${(acc.balance + (income ? num : -num)).toLocaleString('en-US')}` };
+  }
+
+  /* ---------- purchases ---------- */
+  if(has('ابي اشتري','اضف مشترى','مشتريات','ودي اشتري','احتاج اشتري')){
+    const strip = ['ابي','ودي','احتاج','اشتري','اضف','مشترى','مشتريات','ريال','بـ','ب'];
+    let name = t.replace(/\d+(?:[.,]\d+)?/g,' ');
+    strip.forEach(w=> name = name.replace(new RegExp('(^|\\s)'+w+'($|\\s)','g'),' '));
+    name = name.replace(/\s+/g,' ').trim();
+    if(!name) return { ok:false, why:'ما فهمت اسم الغرض' };
+    name = keepOriginal(original, name);
+    return { ok:true, kind:'purchase', name, price:num || 0,
+      title:`إضافة "${name}" للمشتريات`, sub: num ? `${num.toLocaleString('en-US')} ريال` : 'بدون سعر' };
+  }
+
+  /* ---------- tasks ---------- */
+  if(has('خلصت','انجزت','سويت')){
+    const task = matchNamed(t, tasks.filter(x=>x.status!=='done'), x=>x.title);
+    if(task) return { ok:true, kind:'taskDone', taskId:task.id,
+      title:`إنجاز "${task.title}"`, sub:'بيتعلّم كمنجزة' };
+  }
+  if(has('اضف مهمه','مهمه جديده','ذكرني','لا تنسى','مهمه')){
+    const strip = ['اضف','مهمه','جديده','ذكرني','لا','تنسى','اليوم','ب','بـ'];
+    let name = t;
+    strip.forEach(w=> name = name.replace(new RegExp('(^|\\s)'+w+'($|\\s)','g'),' '));
+    name = name.replace(/\s+/g,' ').trim();
+    name = keepOriginal(original, name);
+    if(name) return { ok:true, kind:'task', name,
+      title:`مهمة جديدة: "${name}"`, sub:'تنضاف لمهام اليوم' };
+  }
+
+  /* bare "<exercise> <number>" — e.g. "بنش برس 95" */
+  if(num != null){
+    for(const g in gymLibrary){
+      const hit = matchNamed(t, gymLibrary[g] || [], x=>x.label);
+      if(hit) return { ok:true, kind:'gym', group:g, exKey:hit.key, value:num,
+        title:`${hit.label} — ${num} ${unitOf(g)}`,
+        sub:`${GYM_GROUPS[g].label} · اليوم` };
+    }
+  }
+
+  return { ok:false, why:'ما فهمت الأمر — جرّب صيغة أوضح' };
+}
+
+/* ---- carry out a parsed command ---- */
+async function runCommand(cmd){
+  const key = todayKey;
+  switch(cmd.kind){
+    case 'money': {
+      const acc = accounts.find(a=>a.id===cmd.accId);
+      if(!acc) return false;
+      txData[cmd.accId] = txData[cmd.accId] || [];
+      txData[cmd.accId].unshift({ id:'cmd_'+Date.now().toString(36), date:key,
+        amount:cmd.amount, note:cmd.note || '', type: cmd.income ? 'income' : 'expense',
+        cat: cmd.income ? null : cmd.cat });
+      acc.balance += cmd.income ? cmd.amount : -cmd.amount;
+      store.set('finTx', txData); store.set('finAccounts', accounts);
+      if(typeof renderAccounts === 'function') renderAccounts();
+      if(activeAccId === cmd.accId && typeof renderAccountDetail === 'function') renderAccountDetail();
+      return true;
+    }
+    case 'gymNew': {
+      const lib = gymLibrary[cmd.group] = gymLibrary[cmd.group] || [];
+      let hit = lib.find(x=>normAr(x.label) === normAr(cmd.name));
+      if(!hit){ hit = { key:'ex_'+Date.now().toString(36), label:cmd.name }; lib.push(hit); }
+      store.set('gymLibrary', gymLibrary);
+      cmd.exKey = hit.key;
+      /* falls through */
+    }
+    case 'gym': {
+      gymDay[key] = gymDay[key] || {};
+      gymDay[key][cmd.group] = gymDay[key][cmd.group] || [];
+      if(!gymDay[key][cmd.group].includes(cmd.exKey)) gymDay[key][cmd.group].push(cmd.exKey);
+      gymLog[key] = gymLog[key] || {};
+      gymLog[key][cmd.exKey] = String(cmd.value);
+      store.set('gymDay', gymDay); store.set('gymLog', gymLog);
+      selectedGroup = cmd.group;
+      if(typeof renderGym === 'function') renderGym();
+      return true;
+    }
+    case 'purchase': {
+      purchases.push({ id:Date.now().toString(), title:cmd.name, price:cmd.price,
+        note:'', priority:'medium', done:false, doneAt:null });
+      store.set('purchases', purchases);
+      if(typeof renderPurchases === 'function') renderPurchases();
+      return true;
+    }
+    case 'task': {
+      tasks.push({ id:Date.now().toString(), title:cmd.name, cat:'other', status:'pending' });
+      saveTasks();
+      return true;
+    }
+    case 'taskDone': {
+      const t = tasks.find(x=>x.id===cmd.taskId);
+      if(!t) return false;
+      t.status = 'done'; saveTasks(); celebrate();
+      return true;
+    }
+    case 'subPay': {
+      const sub = subscriptions.find(x=>x.id===cmd.subId);
+      if(!sub) return false;
+      const st = subStatus(sub);
+      document.getElementById('cmdModal').classList.remove('show');
+      await togglePayment(sub, st.index, true);
+      if(typeof renderSubs === 'function') renderSubs();
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ---- the sheet ---- */
+(function initCommands(){
+  const modal = document.getElementById('cmdModal');
+  const input = document.getElementById('cmdInput');
+  const state = document.getElementById('cmdState');
+  const prev  = document.getElementById('cmdPreview');
+  const mic   = document.getElementById('cmdMic');
+  let pending = null, rec = null, listening = false;
+
+  const HINTS = ['اخصم من الراجحي ٢٠ عشا','سجل باي بار ٧ كيلو',
+                 'صرفت ٥٠ بنزين','أضف مهمة اتصل بالوالد','أبي أشتري ساعة ٣٥٠٠'];
+
+  function setState(msg, bad){
+    state.textContent = msg || '';
+    state.classList.toggle('err', !!bad);
+  }
+  function preview(){
+    const raw = input.value.trim();
+    if(!raw){ prev.style.display='none'; pending=null; return; }
+    const cmd = parseCommand(raw);
+    pending = cmd.ok ? cmd : null;
+    prev.style.display = 'block';
+    prev.className = 'cmd-preview' + (cmd.ok ? '' : ' bad');
+    prev.innerHTML = cmd.ok
+      ? `<div class="cmd-pv-head">فهمت</div>
+         <div class="cmd-pv-main">${esc(cmd.title)}</div>
+         <div class="cmd-pv-sub">${esc(cmd.sub || '')}</div>`
+      : `<div class="cmd-pv-head">ما قدرت</div>
+         <div class="cmd-pv-main">${esc(cmd.why)}</div>
+         <div class="cmd-pv-sub">جرّب واحدة من الأمثلة تحت</div>`;
+  }
+  input.addEventListener('input', preview);
+  input.addEventListener('keydown', e=>{ if(e.key === 'Enter') document.getElementById('cmdRun').click(); });
+
+  // quick examples
+  const hintWrap = document.getElementById('cmdHints');
+  HINTS.forEach(h=>{
+    const c = document.createElement('div');
+    c.className = 'cmd-hint'; c.textContent = h;
+    c.addEventListener('click', ()=>{ input.value = h; preview(); });
+    hintWrap.appendChild(c);
+  });
+
+  /* voice, where the browser supports it */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  function startVoice(){
+    if(!SR){ setState('جهازك ما يدعم الإدخال الصوتي — اكتب أمرك', true); return; }
+    if(listening){ try{ rec.stop(); }catch(e){} return; }
+    try{
+      rec = new SR();
+      rec.lang = 'ar-SA'; rec.interimResults = true; rec.maxAlternatives = 1;
+      rec.onstart = ()=>{ listening = true; mic.classList.add('listening'); setState('أسمعك… تكلّم'); buzz('soft'); };
+      rec.onresult = e=>{
+        let txt = '';
+        for(let i = e.resultIndex; i < e.results.length; i++) txt += e.results[i][0].transcript;
+        input.value = txt; preview();
+      };
+      rec.onerror = ev=>{
+        listening = false; mic.classList.remove('listening');
+        setState(ev.error === 'not-allowed' ? 'ما أذنت للميكروفون' : 'ما قدرت أسمع — جرّب مرة ثانية', true);
+      };
+      rec.onend = ()=>{ listening = false; mic.classList.remove('listening');
+        if(!input.value.trim()) setState('ما سمعت شي — جرّب مرة ثانية', true);
+        else setState('راجع الأمر تحت واضغط تنفيذ'); };
+      rec.start();
+    }catch(e){ setState('تعذّر تشغيل الميكروفون', true); }
+  }
+  mic.addEventListener('click', startVoice);
+
+  document.getElementById('cmdFab').addEventListener('click', ()=>{
+    input.value = ''; prev.style.display='none'; pending=null;
+    setState(SR ? 'اضغط الميكروفون أو اكتب أمرك' : 'اكتب أمرك');
+    modal.classList.add('show');
+    setTimeout(()=> input.focus(), 120);
+  });
+  const close = ()=>{ try{ if(listening) rec.stop(); }catch(e){} modal.classList.remove('show'); };
+  document.getElementById('cmdCancel').addEventListener('click', close);
+  modal.addEventListener('click', e=>{ if(e.target === modal) close(); });
+
+  document.getElementById('cmdRun').addEventListener('click', async ()=>{
+    if(!pending){ preview(); if(!pending){ setState('ما فهمت الأمر', true); return; } }
+    const cmd = pending;
+    const done = await runCommand(cmd);
+    if(done){
+      buzz('strong');
+      showToast('تم ✓');
+      close();
+    } else {
+      setState('ما قدرت أنفّذ الأمر', true);
+    }
+  });
+})();
+
 /* ---- manual backup ----
    Writes a plain JSON file of everything the app stores, so there is a copy
    that does not depend on remembering the password. */
