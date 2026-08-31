@@ -743,6 +743,19 @@
   .cmd-preview.bad{border-color:rgba(138,51,65,.5);
     background:linear-gradient(150deg, rgba(138,51,65,.16), transparent 62%);}
 
+  /* ---------- spoken answers ---------- */
+  .cmd-answer{display:flex; align-items:flex-start; gap:11px; margin-top:12px; padding:15px;
+    border-radius:18px;
+    background:linear-gradient(150deg, rgba(61,122,92,.16), rgba(61,122,92,.04) 62%, transparent);
+    border:1px solid rgba(61,122,92,.34);}
+  .cmd-ans-ic{font-size:17px; flex:0 0 auto; line-height:1.4;}
+  .cmd-ans-txt{flex:1; font-size:14px; color:var(--text-0); line-height:1.75; font-weight:600;}
+  .cmd-ans-replay{flex:0 0 auto; width:32px; height:32px; border-radius:50%; cursor:pointer;
+    font-size:13px; padding:0; color:var(--text-1);
+    background:rgba(185,164,131,.1); border:1px solid var(--glass-brd);
+    transition:transform var(--dur-fast) var(--ease-spring);}
+  .cmd-ans-replay:active{transform:scale(.86);}
+
   /* ---------- backup ---------- */
   .backup-box{padding:16px; border-radius:20px; margin-bottom:20px;
     background:linear-gradient(160deg, rgba(185,164,131,.08), rgba(185,164,131,.025) 62%, transparent);
@@ -1383,9 +1396,14 @@
     </div>
     <div class="cmd-state" id="cmdState">اضغط الميكروفون أو اكتب أمرك</div>
 
-    <input class="add-input" id="cmdInput" placeholder="مثال: اخصم من الراجحي ٢٠ عشا" />
+    <input class="add-input" id="cmdInput" placeholder="نفّذ أمراً أو اسأل سؤالاً" />
 
     <div class="cmd-preview" id="cmdPreview" style="display:none;"></div>
+    <div class="cmd-answer" id="cmdAnswer" style="display:none;">
+      <div class="cmd-ans-ic">💬</div>
+      <div class="cmd-ans-txt" id="cmdAnsTxt"></div>
+      <button class="cmd-ans-replay" id="cmdReplay" aria-label="أعد">🔊</button>
+    </div>
 
     <div class="modal-actions">
       <button class="modal-btn cancel" id="cmdCancel">إغلاق</button>
@@ -3316,12 +3334,18 @@ function parseCommand(raw){
     for(const g in GW){ if(GW[g].some(w=> t.includes(w))){ group = g; break; } }
     // which exercise? search that group's library, else all
     let ex = null;
-    if(group) ex = matchNamed(t, gymLibrary[group] || [], x=>x.label);
-    if(!ex){
+    if(group){
+      ex = matchNamed(t, gymLibrary[group] || [], x=>x.label, 60);
+    } else {
+      let bestG = null, best = null, bestScore = 0;
       for(const g in gymLibrary){
-        const hit = matchNamed(t, gymLibrary[g] || [], x=>x.label);
-        if(hit){ ex = hit; group = g; break; }
+        const hit = matchNamed(t, gymLibrary[g] || [], x=>x.label, 60);
+        if(hit){
+          const sc = normAr(t).includes(normAr(hit.label)) ? 2 : 1;
+          if(sc > bestScore){ bestScore = sc; best = hit; bestG = g; }
+        }
       }
+      if(best){ ex = best; group = bestG; }
     }
     if(num == null) return { ok:false, why:'ما فهمت الرقم' };
     if(!group)      return { ok:false, why:'ما عرفت أي عضلة' };
@@ -3495,6 +3519,137 @@ async function runCommand(cmd){
   return false;
 }
 
+/* ==================================================================
+   QUESTIONS — answers spoken back, using only what is stored locally.
+   ================================================================== */
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) return false;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(String(text));
+    u.lang = 'ar-SA'; u.rate = 0.95; u.pitch = 1;
+    const arVoice = speechSynthesis.getVoices().find(v=> /^ar/i.test(v.lang));
+    if(arVoice) u.voice = arVoice;
+    speechSynthesis.speak(u);
+    return true;
+  }catch(e){ return false; }
+}
+const money = n => Math.round(n).toLocaleString('en-US');
+function whenText(dateKey){
+  if(dateKey === todayKey) return 'اليوم';
+  const d = parseLocalDate(dateKey), t = parseLocalDate(todayKey);
+  const days = Math.round((t - d)/86400000);
+  if(days === 1) return 'أمس';
+  if(days < 7)   return `قبل ${days} أيام`;
+  return `${d.getDate()} ${arMonths[d.getMonth()]}`;
+}
+
+/* Try to read the sentence as a question. Returns a spoken answer or null. */
+function answerQuestion(raw){
+  const t = cleanHeard(raw);
+  const asking = /(^|\s)(كم|وش|ايش|متي|كيف|هل|اخر|باقي|عندي|وين|اعلي|افضل)(\s|$)/.test(t);
+  if(!asking) return null;
+
+  /* ---- gym: last / best weight for a muscle or a named exercise ---- */
+  const GW = { chest:['صدر','بنش'], back:['ظهر','سحب'], shoulder:['كتف'],
+               bicep:['باي'], tricep:['تراي'], steps:['خطوات','مشي'] };
+  let group = null;
+  for(const g in GW){ if(GW[g].some(w=> t.includes(w))){ group = g; break; } }
+  let ex = null;
+  for(const g in gymLibrary){
+    const hit = matchNamed(t, gymLibrary[g] || [], x=>x.label, 60);
+    if(hit){ ex = hit; group = group || g; break; }
+  }
+
+  if(group || ex){
+    const wantBest = /(اعلي|افضل|اقصي|رقم قياسي|احسن|ريكورد)/.test(t);
+    if(ex){
+      const best = exercisePR(ex.key, null);
+      const last = exerciseLast(ex.key, '9999-99-99');
+      const u = unitOf(group || groupOfExercise(ex.key) || 'chest');
+      if(wantBest) return best ? `أعلى رقم على ${ex.label} هو ${best} ${u}` : `ما سجّلت رقم على ${ex.label} بعد`;
+      return last ? `آخر مرة على ${ex.label} كانت ${last.value} ${u}، ${whenText(last.date)}`
+                  : `ما سجّلت ${ex.label} بعد`;
+    }
+    // muscle only: find the most recent entry across that group
+    const keys = (gymLibrary[group] || []).map(x=>x.key);
+    let last = null;
+    Object.keys(gymLog).sort().reverse().some(d=>{
+      for(const k of keys){
+        const n = parseFloat(gymLog[d][k]);
+        if(!isNaN(n)){ last = { d, k, n }; return true; }
+      }
+      return false;
+    });
+    const label = GYM_GROUPS[group].label, u = unitOf(group);
+    if(wantBest){
+      const pr = computePR(group);
+      return pr ? `أعلى رقم في ${label} هو ${pr} ${u}` : `ما فيه أرقام مسجّلة في ${label}`;
+    }
+    return last ? `آخر ${label} كان ${labelOfExercise(last.k)} بـ ${last.n} ${u}، ${whenText(last.d)}`
+                : `ما سجّلت ${label} بعد`;
+  }
+
+  /* ---- money ---- */
+  if(/(رصيد|كم عندي|كم في|فلوس|حسابي)/.test(t)){
+    const acc = matchNamed(t, accounts, a=>a.name, 45);
+    if(acc) return `رصيد ${acc.name} ${money(acc.balance)} ريال`;
+    const total = accounts.reduce((s,a)=> s + (Number(a.balance)||0), 0);
+    if(!accounts.length) return 'ما عندك حسابات مسجّلة';
+    return `مجموع حساباتك ${money(total)} ريال في ${accounts.length} حسابات`;
+  }
+  if(/(صرفت|الصرف|مصروف)/.test(t)){
+    const thisMonth = /(الشهر|شهر)/.test(t);
+    const list = thisMonth ? monthExpenses(thisMonthKey())
+                           : (()=>{ const set = new Set(dayKeysBack(7,0)); const out=[];
+                               Object.values(txData).forEach(l=>(l||[]).forEach(x=>{
+                                 if(x.type!=='income' && set.has(x.date)) out.push(x); })); return out; })();
+    const total = sumOf(list);
+    const period = thisMonth ? 'هذا الشهر' : 'آخر أسبوع';
+    if(!total) return `ما صرفت شي ${period}`;
+    if(thisMonth && budget){
+      const left = budget - total;
+      return left >= 0 ? `صرفت ${money(total)} ريال ${period}، باقي لك ${money(left)} من الميزانية`
+                       : `صرفت ${money(total)} ريال ${period}، تجاوزت الميزانية بـ ${money(-left)}`;
+    }
+    return `صرفت ${money(total)} ريال ${period}`;
+  }
+
+  /* ---- tasks ---- */
+  if(/(مهام|مهمه|باقي علي|عندي اليوم)/.test(t)){
+    const open = tasks.filter(x=>x.status!=='done');
+    const done = tasks.filter(x=>x.status==='done').length;
+    if(!tasks.length) return 'ما عندك مهام اليوم';
+    if(!open.length)  return `خلّصت كل مهامك اليوم، ${done} مهمة`;
+    const names = open.slice(0,3).map(x=>x.title).join('، ');
+    return `باقي عليك ${open.length} من ${tasks.length}: ${names}`;
+  }
+
+  /* ---- subscriptions ---- */
+  if(/(اشتراك|اشتراكات|يتجدد|مستحق)/.test(t)){
+    const due = subscriptions.filter(x=>!planDone(x))
+      .map(sub=>({ sub, st: subStatus(sub) }))
+      .filter(x=> !x.st.paid && x.st.kind !== 'upcoming')
+      .sort((a,b)=> periodStart(a.sub, a.st.index) - periodStart(b.sub, b.st.index));
+    if(!subscriptions.length) return 'ما عندك اشتراكات مسجّلة';
+    if(!due.length) return 'كل اشتراكاتك مدفوعة';
+    const first = due[0];
+    return `عندك ${due.length} مستحق، أقربها ${first.sub.name} بـ ${money(first.sub.amount)} ريال`;
+  }
+
+  /* ---- goals ---- */
+  if(/(هدف|اهداف)/.test(t)){
+    const active = goals.filter(g=>!g.done);
+    if(!goals.length)  return 'ما عندك أهداف مسجّلة';
+    if(!active.length) return 'خلّصت كل أهدافك';
+    const g = active.slice().sort((a,b)=> goalEnd(a) - goalEnd(b))[0];
+    const pr = goalProgress(g);
+    return `عندك ${active.length} أهداف، أقربها "${g.name}" باقي له ${pr.left} يوم`;
+  }
+
+  return null;
+}
+
 /* ---- the sheet ---- */
 (function initCommands(){
   const modal = document.getElementById('cmdModal');
@@ -3508,9 +3663,30 @@ async function runCommand(cmd){
     state.textContent = msg || '';
     state.classList.toggle('err', !!bad);
   }
+  const answer   = document.getElementById('cmdAnswer');
+  const answerTx = document.getElementById('cmdAnsTxt');
+  let lastAnswer = '';
+
+  function showAnswer(text){
+    lastAnswer = text;
+    answerTx.textContent = text;
+    answer.style.display = 'flex';
+    prev.style.display = 'none';
+    pending = null;
+    speak(text);
+  }
+
   function preview(){
     const raw = input.value.trim();
+    answer.style.display = 'none';
     if(!raw){ prev.style.display='none'; pending=null; return; }
+
+    // a question is answered out loud rather than executed
+    const ans = answerQuestion(raw);
+    if(ans){ pending = { kind:'answer', text:ans }; prev.style.display='none';
+      answerTx.textContent = ans; answer.style.display='flex';
+      setState('اضغط تنفيذ لسماع الجواب'); return; }
+
     const cmd = parseCommand(raw);
     pending = cmd.ok ? cmd : null;
     prev.style.display = 'block';
@@ -3536,7 +3712,7 @@ async function runCommand(cmd){
   function bestAlternative(alts){
     let fallback = alts[0] || '';
     for(const a of alts){
-      if(parseCommand(a).ok) return String(a).trim();
+      if(answerQuestion(a) || parseCommand(a).ok) return String(a).trim();
     }
     return String(fallback).trim();
   }
@@ -3574,10 +3750,12 @@ async function runCommand(cmd){
         if(finalAlts){
           gotFinal = true;
           input.value = bestAlternative(finalAlts);
+          stopVoice();
+          const spokenAnswer = answerQuestion(input.value);
+          if(spokenAnswer){ showAnswer(spokenAnswer); setState('جوابك فوق'); return; }
           preview();
           const cmd = parseCommand(input.value);
           setState(cmd.ok ? 'راجع الأمر تحت واضغط تنفيذ' : 'ما فهمته تماماً — عدّله بالكتابة', !cmd.ok);
-          stopVoice();
         } else if(interim.trim()){
           input.value = String(interim).trim();
           setState('أسمع: ' + interim.trim());
@@ -3613,13 +3791,19 @@ async function runCommand(cmd){
     modal.classList.add('show');
     setTimeout(()=> input.focus(), 120);
   });
-  const close = ()=>{ try{ if(listening) stopVoice(); }catch(e){} modal.classList.remove('show'); };
+  const close = ()=>{ try{ if(listening) stopVoice(); }catch(e){}
+    try{ speechSynthesis.cancel(); }catch(e){}
+    modal.classList.remove('show'); };
+  document.getElementById('cmdReplay').addEventListener('click', ()=>{
+    if(lastAnswer) speak(lastAnswer);
+  });
   document.getElementById('cmdCancel').addEventListener('click', close);
   modal.addEventListener('click', e=>{ if(e.target === modal) close(); });
 
   document.getElementById('cmdRun').addEventListener('click', async ()=>{
     if(!pending){ preview(); if(!pending){ setState('ما فهمت الأمر', true); return; } }
     const cmd = pending;
+    if(cmd.kind === 'answer'){ showAnswer(cmd.text); buzz('soft'); return; }
     const done = await runCommand(cmd);
     if(done){
       buzz('strong');
