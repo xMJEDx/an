@@ -706,22 +706,31 @@
   @keyframes cmdWave{0%,100%{transform:scaleY(.45); opacity:.35;} 50%{transform:scaleY(1); opacity:.9;}}
   @media (prefers-reduced-motion:reduce){ .cmd-bar-wave i{animation:none;} }
 
-  .cmd-mic{position:relative; width:84px; height:84px; margin:6px auto 12px; cursor:pointer;
+  .cmd-mic{position:relative; width:88px; height:88px; margin:8px auto 14px; cursor:pointer;
     border-radius:50%; display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(150deg, rgba(185,164,131,.18), rgba(185,164,131,.05));
-    border:1px solid var(--glass-brd-strong);
-    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-mid) var(--ease-soft);}
-  .cmd-mic:active{transform:scale(.92);}
-  .cmd-mic-ic{font-size:32px; line-height:1;}
-  .cmd-mic-ring{position:absolute; inset:-6px; border-radius:50%; opacity:0;
-    border:2px solid var(--gold);}
-  .cmd-mic.listening{background:linear-gradient(150deg, rgba(138,51,65,.3), rgba(138,51,65,.1));
-    border-color:rgba(138,51,65,.6);}
-  .cmd-mic.listening .cmd-mic-ring{opacity:1; animation:micPulse 1.4s var(--ease-soft) infinite;}
+    color:#221a11;
+    background:radial-gradient(circle at 35% 28%, #efe3c6 0%, #dccdaa 40%, #bda98a 72%, #9c8a6d 100%);
+    box-shadow:0 14px 34px -14px rgba(185,164,131,.85),
+      inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 6px rgba(0,0,0,.18);
+    border:none;
+    transition:transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-mid) var(--ease-soft);}
+  .cmd-mic:active{transform:scale(.93);}
+  .cmd-mic-ic{width:34px; height:34px; display:block; position:relative; z-index:2;}
+  .cmd-mic-ring{position:absolute; inset:0; border-radius:50%; opacity:0;
+    border:2px solid rgba(203,184,148,.9); pointer-events:none;}
+  .cmd-mic-ring.two{animation-delay:.7s;}
+  .cmd-mic.listening{
+    background:radial-gradient(circle at 35% 28%, #f0cfcf 0%, #d79c9c 42%, #b7576a 78%, #8a3341 100%);
+    color:#2a1216;
+    box-shadow:0 14px 34px -14px rgba(183,87,106,.9),
+      inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 6px rgba(0,0,0,.2);}
+  .cmd-mic.listening .cmd-mic-ring{opacity:1; border-color:rgba(183,87,106,.85);
+    animation:micPulse 1.8s var(--ease-soft) infinite;}
   @keyframes micPulse{
-    0%{transform:scale(1); opacity:.8;}
-    100%{transform:scale(1.35); opacity:0;}
+    0%{transform:scale(1); opacity:.75;}
+    100%{transform:scale(1.6); opacity:0;}
   }
+  @media (prefers-reduced-motion:reduce){ .cmd-mic-ring{animation:none !important;} }
   .cmd-state{text-align:center; font-size:11.5px; color:var(--text-2); margin-bottom:12px; min-height:16px;}
   .cmd-state.err{color:#d99;}
 
@@ -733,12 +742,6 @@
   .cmd-pv-sub{font-size:11.5px; color:var(--text-1); margin-top:5px; line-height:1.6;}
   .cmd-preview.bad{border-color:rgba(138,51,65,.5);
     background:linear-gradient(150deg, rgba(138,51,65,.16), transparent 62%);}
-
-  .cmd-hints{display:flex; gap:6px; flex-wrap:wrap; margin-top:12px;}
-  .cmd-hint{font-size:10.5px; padding:7px 11px; border-radius:99px; cursor:pointer;
-    color:var(--text-2); background:var(--glass); border:1px solid var(--glass-brd);
-    transition:transform var(--dur-fast) var(--ease-spring), color var(--dur-fast) var(--ease-soft);}
-  .cmd-hint:active{transform:scale(.93); color:var(--text-0);}
 
   /* ---------- backup ---------- */
   .backup-box{padding:16px; border-radius:20px; margin-bottom:20px;
@@ -1370,15 +1373,19 @@
 
     <div class="cmd-mic" id="cmdMic">
       <div class="cmd-mic-ring"></div>
-      <div class="cmd-mic-ic">🎙️</div>
+      <div class="cmd-mic-ring two"></div>
+      <svg class="cmd-mic-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="2" width="6" height="12" rx="3"/>
+        <path d="M5 11.5a7 7 0 0 0 14 0"/>
+        <line x1="12" y1="18.5" x2="12" y2="22"/>
+      </svg>
     </div>
     <div class="cmd-state" id="cmdState">اضغط الميكروفون أو اكتب أمرك</div>
 
     <input class="add-input" id="cmdInput" placeholder="مثال: اخصم من الراجحي ٢٠ عشا" />
 
     <div class="cmd-preview" id="cmdPreview" style="display:none;"></div>
-
-    <div class="cmd-hints" id="cmdHints"></div>
 
     <div class="modal-actions">
       <button class="modal-btn cancel" id="cmdCancel">إغلاق</button>
@@ -3158,23 +3165,75 @@ function soundsLike(arabicWord, latinName){
   return a === b || a.includes(b) || b.includes(a);
 }
 
+/* ---- fuzzy name matching ----
+   Picks the closest thing you actually created. "راج" should land on
+   "الراجحي" rather than "راشد", so every candidate gets a score and the
+   best one wins instead of the first one that happens to touch. */
+function stripAl(w){ return String(w).replace(/^ال/, ''); }
+
+/* how many leading letters two words share */
+function sharedPrefix(a, b){
+  let i = 0;
+  while(i < a.length && i < b.length && a[i] === b[i]) i++;
+  return i;
+}
+/* small edit distance, capped so long words stay cheap */
+function editDistance(a, b){
+  if(Math.abs(a.length - b.length) > 4) return 99;
+  const dp = Array.from({length:a.length+1}, (_,i)=> [i, ...Array(b.length).fill(0)]);
+  for(let j=0;j<=b.length;j++) dp[0][j] = j;
+  for(let i=1;i<=a.length;i++)
+    for(let j=1;j<=b.length;j++)
+      dp[i][j] = Math.min(dp[i-1][j]+1, dp[i][j-1]+1,
+                          dp[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  return dp[a.length][b.length];
+}
+
+/* score one spoken word against one stored name; 0 means "no" */
+function scoreWord(spoken, target){
+  const sp = stripAl(spoken), tg = stripAl(target);
+  if(!sp || !tg || sp.length < 2) return 0;
+  if(sp === tg) return 100;
+  if(tg.startsWith(sp) || sp.startsWith(tg)){
+    // "راج" inside "راجحي" — the longer the shared start, the surer we are
+    return 70 + Math.min(25, sharedPrefix(sp, tg) * 6);
+  }
+  if(tg.includes(sp) && sp.length >= 3) return 60 + Math.min(20, sp.length * 3);
+  const d = editDistance(sp, tg);
+  const longest = Math.max(sp.length, tg.length);
+  if(d <= 1) return 65;
+  if(d === 2 && longest >= 5) return 50;
+  const shared = sharedPrefix(sp, tg);
+  if(shared >= 3 && shared >= Math.min(sp.length, tg.length) - 1) return 45 + shared * 3;
+  return 0;
+}
+
 /* best match of a name inside the sentence, from a list the user created */
-function matchNamed(text, items, getName){
-  let best = null, bestLen = 0;
-  const spoken = text.split(' ').filter(w=>w.length >= 3);
+function matchNamed(text, items, getName, minScore){
+  const words = normAr(text).split(' ').filter(w=>w.length >= 2);
+  let best = null, bestScore = 0;
   items.forEach(it=>{
     const raw  = getName(it) || '';
     const name = normAr(raw);
     if(!name) return;
-    const words = name.split(' ').filter(w=>w.length > 1);
-    let hit = text.includes(name);
-    if(!hit && words.length) hit = words.some(w=> text.includes(w) && w.length >= 3);
-    // a Latin name said in Arabic letters
-    if(!hit && /[a-z]/i.test(raw)) hit = spoken.some(w=> soundsLike(w, raw));
-    if(hit && name.length >= bestLen){ best = it; bestLen = name.length; }
+    const parts = name.split(' ').filter(Boolean);
+    let score = 0;
+
+    // whole name appears verbatim — nothing beats that
+    if(normAr(text).includes(name)) score = 120 + name.length;
+
+    // otherwise score every spoken word against every word of the name
+    if(!score){
+      words.forEach(w=>{
+        parts.forEach(part=>{ score = Math.max(score, scoreWord(w, part)); });
+        if(/[a-z]/i.test(raw) && soundsLike(w, raw)) score = Math.max(score, 85);
+      });
+    }
+    if(score > bestScore){ bestScore = score; best = it; }
   });
-  return best;
+  return bestScore >= (minScore || 45) ? best : null;
 }
+
 const CAT_WORDS = {
   food:['عشا','غدا','فطور','اكل','مطعم','قهوه','كافيه','وجبه','برجر','بقاله','سوبرماركت'],
   fuel:['بنزين','وقود','محطه','تعبئه','بترول'],
@@ -3445,9 +3504,6 @@ async function runCommand(cmd){
   const mic   = document.getElementById('cmdMic');
   let pending = null, rec = null, listening = false;
 
-  const HINTS = ['اخصم من الراجحي ٢٠ عشا','سجل باي بار ٧ كيلو',
-                 'صرفت ٥٠ بنزين','أضف مهمة اتصل بالوالد','أبي أشتري ساعة ٣٥٠٠'];
-
   function setState(msg, bad){
     state.textContent = msg || '';
     state.classList.toggle('err', !!bad);
@@ -3469,15 +3525,6 @@ async function runCommand(cmd){
   }
   input.addEventListener('input', preview);
   input.addEventListener('keydown', e=>{ if(e.key === 'Enter') document.getElementById('cmdRun').click(); });
-
-  // quick examples
-  const hintWrap = document.getElementById('cmdHints');
-  HINTS.forEach(h=>{
-    const c = document.createElement('div');
-    c.className = 'cmd-hint'; c.textContent = h;
-    c.addEventListener('click', ()=>{ input.value = h; preview(); });
-    hintWrap.appendChild(c);
-  });
 
   /* ---- voice ----
      Speech engines mishear short Arabic words, so we ask for several
@@ -3887,7 +3934,6 @@ function makeSwipable(el, onDelete, label){
 const REPEATS = {
   none:    'مرة واحدة',
   daily:   'كل يوم',
-  weekdays:'أيام العمل',
   weekly:  'كل أسبوع',
   monthly: 'كل شهر',
 };
@@ -3918,7 +3964,6 @@ function repeatDueOn(rule, date){
   const days = Math.round((date - anchor) / 86400000);
   switch(rule.repeat){
     case 'daily':    return true;
-    case 'weekdays': return date.getDay() >= 0 && date.getDay() <= 4;   // Sun–Thu
     case 'weekly':   return days % 7 === 0;
     case 'monthly':  return date.getDate() === anchor.getDate();
     default:         return false;
