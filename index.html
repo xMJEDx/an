@@ -3522,17 +3522,62 @@ async function runCommand(cmd){
 /* ==================================================================
    QUESTIONS — answers spoken back, using only what is stored locally.
    ================================================================== */
-function speak(text){
+/* iOS only allows speech that starts from a real tap, and it loads its
+   voice list asynchronously. So we unlock on the first touch and keep a
+   cached Arabic voice around. */
+let ttsReady = false, arVoice = null, ttsBlocked = false;
+
+function loadVoices(){
   try{
-    if(!('speechSynthesis' in window)) return false;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(String(text));
-    u.lang = 'ar-SA'; u.rate = 0.95; u.pitch = 1;
-    const arVoice = speechSynthesis.getVoices().find(v=> /^ar/i.test(v.lang));
-    if(arVoice) u.voice = arVoice;
-    speechSynthesis.speak(u);
+    const list = speechSynthesis.getVoices() || [];
+    if(!list.length) return false;
+    arVoice = list.find(v=> /^ar[-_]?sa/i.test(v.lang))
+           || list.find(v=> /^ar/i.test(v.lang))
+           || null;
     return true;
   }catch(e){ return false; }
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  try{ speechSynthesis.onvoiceschanged = loadVoices; }catch(e){}
+}
+
+/* call this from inside a click/tap so iOS marks audio as allowed */
+function unlockSpeech(){
+  if(ttsReady || !('speechSynthesis' in window)) return;
+  try{
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0; u.rate = 1;
+    speechSynthesis.speak(u);
+    ttsReady = true;
+    loadVoices();
+  }catch(e){}
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){ ttsBlocked = true; return false; }
+  try{
+    speechSynthesis.cancel();
+    let started = false;
+    const say = ()=>{
+      const u = new SpeechSynthesisUtterance(String(text));
+      u.lang = 'ar-SA'; u.rate = 0.95; u.pitch = 1; u.volume = 1;
+      if(!arVoice) loadVoices();
+      if(arVoice) u.voice = arVoice;
+      u.onstart = ()=>{ started = true; };
+      u.onend   = ()=>{ started = true; };
+      u.onerror = ()=>{ ttsBlocked = true; };
+      speechSynthesis.speak(u);
+    };
+    say();
+    // Safari occasionally drops the very first utterance while it wakes up,
+    // so try once more only if nothing ever began playing
+    setTimeout(()=>{
+      if(started) return;
+      try{ if(!speechSynthesis.speaking && !speechSynthesis.pending) say(); }catch(e){}
+    }, 320);
+    return true;
+  }catch(e){ ttsBlocked = true; return false; }
 }
 const money = n => Math.round(n).toLocaleString('en-US');
 function whenText(dateKey){
@@ -3673,7 +3718,10 @@ function answerQuestion(raw){
     answer.style.display = 'flex';
     prev.style.display = 'none';
     pending = null;
-    speak(text);
+    const spoke = speak(text);
+    setTimeout(()=>{
+      if(!spoke || ttsBlocked) setState('الجواب مكتوب فوق — جهازك ما نطقه', true);
+    }, 700);
   }
 
   function preview(){
@@ -3783,10 +3831,12 @@ function answerQuestion(raw){
       rec.start();
     }catch(e){ setState('تعذّر تشغيل الميكروفون', true); }
   }
-  mic.addEventListener('click', startVoice);
+  mic.addEventListener('click', ()=>{ unlockSpeech(); startVoice(); });
 
   document.getElementById('cmdFab').addEventListener('click', ()=>{
+    unlockSpeech();                       // must happen inside the tap
     input.value = ''; prev.style.display='none'; pending=null;
+    answer.style.display = 'none';
     setState(SR ? 'اضغط الميكروفون أو اكتب أمرك' : 'اكتب أمرك');
     modal.classList.add('show');
     setTimeout(()=> input.focus(), 120);
@@ -3795,6 +3845,7 @@ function answerQuestion(raw){
     try{ speechSynthesis.cancel(); }catch(e){}
     modal.classList.remove('show'); };
   document.getElementById('cmdReplay').addEventListener('click', ()=>{
+    unlockSpeech();
     if(lastAnswer) speak(lastAnswer);
   });
   document.getElementById('cmdCancel').addEventListener('click', close);
