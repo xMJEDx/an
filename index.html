@@ -505,17 +505,7 @@
 
   .gym-rule{height:1px; margin:22px 0 4px;
     background:linear-gradient(90deg, transparent, var(--glass-brd-strong) 30%, var(--glass-brd-strong) 70%, transparent);}
-  .gym-section-tabs{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:16px;}
-  .gym-section-tab{padding:13px 4px; border-radius:16px; background:var(--glass); border:1px solid var(--glass-brd);
-    text-align:center; font-size:11.5px; font-weight:700; color:var(--text-1); cursor:pointer;
-    transition:transform var(--dur-fast) var(--ease-spring), background var(--dur-mid) var(--ease-soft),
-      border-color var(--dur-mid) var(--ease-soft), color var(--dur-mid) var(--ease-soft),
-      box-shadow var(--dur-mid) var(--ease-soft);}
-  .gym-section-tab:active{transform:scale(.94);}
-  .gym-section-tab.active{border-color:var(--sec-c); color:var(--text-0);
-    background:color-mix(in srgb, var(--sec-c) 22%, transparent);
-    box-shadow:0 8px 20px -10px var(--sec-c);}
-  .gym-group-tabs{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:14px;}
+          .gym-group-tabs{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:14px;}
   .gym-gtab{padding:13px 2px; border-radius:15px; text-align:center; cursor:pointer;
     font-size:11.5px; font-weight:700; color:var(--text-1);
     background:var(--glass); border:1px solid var(--glass-brd);
@@ -550,15 +540,7 @@
   .gym-day-info{text-align:center; flex:1;}
   .gym-day-info .gdn{font-size:13px; color:var(--text-2);}
   .gym-day-info .gdd{font-size:14.5px; font-weight:700; color:var(--text-0);}
-  .gym-split-banner{display:flex; align-items:center; gap:13px; padding:17px; border-radius:22px; margin-bottom:16px;
-    background:linear-gradient(150deg, rgba(185,164,131,.10), rgba(185,164,131,.03) 60%, transparent);
-    border:1px solid var(--glass-brd); border-inline-start:3px solid var(--split-c); box-shadow:var(--sh-md);}
-  .gym-split-ic{width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center;
-    font-size:21px; background:rgba(185,164,131,.18);
-    background:color-mix(in srgb, var(--split-c) 24%, transparent); flex:0 0 auto;}
-  .gym-split-title{font-size:16px; font-weight:800; color:var(--text-0);}
-  .gym-split-sub{font-size:11.5px; color:var(--text-2); margin-top:2px;}
-  .gym-ex{display:flex; align-items:center; gap:9px; padding:12px 13px; margin-bottom:9px; border-radius:18px;
+          .gym-ex{display:flex; align-items:center; gap:9px; padding:12px 13px; margin-bottom:9px; border-radius:18px;
     background:linear-gradient(150deg, rgba(185,164,131,.07), rgba(185,164,131,.025) 55%, transparent);
     border:1px solid var(--glass-brd); border-inline-start:3px solid var(--split-c); box-shadow:var(--sh-sm);
     transition:border-color var(--dur-mid) var(--ease-soft), box-shadow var(--dur-mid) var(--ease-soft);}
@@ -707,43 +689,9 @@
     width:32px; height:32px; border-radius:11px; color:#1a1410;
     background:linear-gradient(150deg,#dccdaa,#bda98a);}
   .cmd-bar-txt{flex:1; font-size:13px; letter-spacing:.2px;}
-  .cmd-bar-wave{display:flex; align-items:center; gap:3px; flex:0 0 auto; height:16px;}
-  .cmd-bar-wave i{display:block; width:2.5px; border-radius:99px; background:var(--gold); opacity:.5;
-    animation:cmdWave 1.5s var(--ease-soft) infinite;}
-  .cmd-bar-wave i:nth-child(1){height:6px;  animation-delay:0s;}
-  .cmd-bar-wave i:nth-child(2){height:12px; animation-delay:.18s;}
-  .cmd-bar-wave i:nth-child(3){height:8px;  animation-delay:.36s;}
-  .cmd-bar-wave i:nth-child(4){height:14px; animation-delay:.54s;}
-  @keyframes cmdWave{0%,100%{transform:scaleY(.45); opacity:.35;} 50%{transform:scaleY(1); opacity:.9;}}
-  @media (prefers-reduced-motion:reduce){ .cmd-bar-wave i{animation:none;} }
-
-  .cmd-mic{position:relative; width:88px; height:88px; margin:8px auto 14px; cursor:pointer;
-    border-radius:50%; display:flex; align-items:center; justify-content:center;
-    color:#221a11;
-    background:radial-gradient(circle at 35% 28%, #efe3c6 0%, #dccdaa 40%, #bda98a 72%, #9c8a6d 100%);
-    box-shadow:0 14px 34px -14px rgba(185,164,131,.85),
-      inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 6px rgba(0,0,0,.18);
-    border:none;
-    transition:transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-mid) var(--ease-soft);}
-  .cmd-mic:active{transform:scale(.93);}
-  .cmd-mic-ic{width:34px; height:34px; display:block; position:relative; z-index:2;}
-  .cmd-mic-ring{position:absolute; inset:0; border-radius:50%; opacity:0;
-    border:2px solid rgba(203,184,148,.9); pointer-events:none;}
-  .cmd-mic-ring.two{animation-delay:.7s;}
-  .cmd-mic.listening{
-    background:radial-gradient(circle at 35% 28%, #f0cfcf 0%, #d79c9c 42%, #b7576a 78%, #8a3341 100%);
-    color:#2a1216;
-    box-shadow:0 14px 34px -14px rgba(183,87,106,.9),
-      inset 0 1px 0 rgba(255,255,255,.4), inset 0 -2px 6px rgba(0,0,0,.2);}
-  .cmd-mic.listening .cmd-mic-ring{opacity:1; border-color:rgba(183,87,106,.85);
-    animation:micPulse 1.8s var(--ease-soft) infinite;}
-  @keyframes micPulse{
-    0%{transform:scale(1); opacity:.75;}
-    100%{transform:scale(1.6); opacity:0;}
-  }
-  @media (prefers-reduced-motion:reduce){ .cmd-mic-ring{animation:none !important;} }
-  .cmd-state{text-align:center; font-size:11.5px; color:var(--text-2); margin-bottom:12px; min-height:16px;}
-  .cmd-state.err{color:#d99;}
+  .cmd-bar-plus{flex:0 0 auto; width:22px; height:22px; border-radius:8px; font-size:15px;
+    display:flex; align-items:center; justify-content:center; color:var(--gold);
+    background:rgba(185,164,131,.12); border:1px solid var(--glass-brd);}
 
   .cmd-preview{margin-top:12px; padding:14px; border-radius:18px;
     background:linear-gradient(150deg, rgba(185,164,131,.12), rgba(185,164,131,.03) 62%, transparent);
@@ -753,19 +701,6 @@
   .cmd-pv-sub{font-size:11.5px; color:var(--text-1); margin-top:5px; line-height:1.6;}
   .cmd-preview.bad{border-color:rgba(138,51,65,.5);
     background:linear-gradient(150deg, rgba(138,51,65,.16), transparent 62%);}
-
-  /* ---------- spoken answers ---------- */
-  .cmd-answer{display:flex; align-items:flex-start; gap:11px; margin-top:12px; padding:15px;
-    border-radius:18px;
-    background:linear-gradient(150deg, rgba(61,122,92,.16), rgba(61,122,92,.04) 62%, transparent);
-    border:1px solid rgba(61,122,92,.34);}
-  .cmd-ans-ic{font-size:17px; flex:0 0 auto; line-height:1.4;}
-  .cmd-ans-txt{flex:1; font-size:14px; color:var(--text-0); line-height:1.75; font-weight:600;}
-  .cmd-ans-replay{flex:0 0 auto; width:32px; height:32px; border-radius:50%; cursor:pointer;
-    font-size:13px; padding:0; color:var(--text-1);
-    background:rgba(185,164,131,.1); border:1px solid var(--glass-brd);
-    transition:transform var(--dur-fast) var(--ease-spring);}
-  .cmd-ans-replay:active{transform:scale(.86);}
 
   /* ---------- backup ---------- */
   .backup-box{padding:16px; border-radius:20px; margin-bottom:20px;
@@ -799,8 +734,7 @@
   .wk-stat b{color:var(--text-0);}
 
   /* ---------- weekly summary ---------- */
-  .ws-range{text-align:center; font-size:11px; color:var(--text-2); letter-spacing:.6px; margin-bottom:14px;}
-  .ws-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
+    .ws-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px;}
   .ws-grid > .ws-card:nth-child(5):last-child{grid-column:1 / -1;}
   .ws-card{padding:15px 12px; border-radius:18px; text-align:center;
     background:linear-gradient(160deg, color-mix(in srgb, var(--ws-c) 16%, transparent), transparent 65%);
@@ -813,14 +747,7 @@
   .ws-note{margin-top:14px; padding:13px; border-radius:16px; text-align:center; line-height:1.8;
     font-size:12px; color:var(--text-1);
     background:rgba(185,164,131,.06); border:1px solid var(--glass-brd);}
-  .ws-btn{display:flex; align-items:center; justify-content:center; gap:8px;
-    width:100%; padding:13px; border-radius:18px; cursor:pointer; margin-bottom:14px;
-    font-family:inherit; font-size:12.5px; font-weight:700; color:var(--gold);
-    background:linear-gradient(150deg, rgba(185,164,131,.13), rgba(185,164,131,.04));
-    border:1px solid var(--glass-brd-strong);
-    transition:transform var(--dur-fast) var(--ease-spring);}
-  .ws-btn:active{transform:scale(.97);}
-
+    
   /* ---------- swipe to delete ---------- */
   .swipe{position:relative; touch-action:pan-y;}
   .swipe-inner{position:relative; z-index:2; transition:transform .22s var(--ease-out); will-change:transform;}
@@ -875,6 +802,46 @@
   .cat-amt{font-size:11.5px; font-weight:700; color:var(--text-0); flex:0 0 auto;
     font-variant-numeric:tabular-nums;}
   .cat-pct{font-size:9.5px; color:var(--text-2); flex:0 0 30px; text-align:end;}
+
+  /* ---------- calm / breathing ---------- */
+  .calm-ring{position:relative; width:min(72vw, 230px); aspect-ratio:1; margin:6px auto 18px;}
+  .calm-svg{width:100%; height:100%; transform:rotate(-90deg);}
+  .calm-track{fill:none; stroke:rgba(185,164,131,.13); stroke-width:7;}
+  .calm-prog{fill:none; stroke:url(#calmGrad); stroke:var(--gold); stroke-width:7; stroke-linecap:round;
+    stroke-dasharray:553; stroke-dashoffset:553; transition:stroke-dashoffset .95s linear;}
+  .calm-ring.running .calm-prog{stroke:#8fbfa4;}
+  .calm-mid{position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:5px;}
+  .calm-time{font-family:'Amiri',serif; font-size:44px; font-weight:700; line-height:1;
+    font-variant-numeric:tabular-nums;
+    background:linear-gradient(100deg,#ece5d7,#b9a483);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .calm-hint{font-size:11px; color:var(--text-2); letter-spacing:.5px;}
+  .calm-ring.running .calm-mid{animation:calmBreathe 8s var(--ease-soft) infinite;}
+  @keyframes calmBreathe{0%,100%{transform:scale(1);} 50%{transform:scale(1.06);}}
+  @media (prefers-reduced-motion:reduce){ .calm-ring.running .calm-mid{animation:none;} }
+  .calm-btns{display:flex; gap:9px; margin:16px 0 6px;}
+  .calm-btns .modal-btn{flex:1;}
+
+  /* week grid */
+  .calm-week{display:flex; flex-direction:column; gap:7px;}
+  .cw-row{display:flex; align-items:stretch; gap:7px;}
+  .cw-day{flex:0 0 62px; display:flex; align-items:center; justify-content:center;
+    border-radius:13px; font-size:11.5px; font-weight:700; color:var(--text-1);
+    background:rgba(185,164,131,.06); border:1px solid var(--glass-brd); text-align:center;}
+  .cw-note{flex:1; min-width:0;}
+  .cw-note input{width:100%; height:100%; min-height:42px; padding:10px 13px; border-radius:13px;
+    background:rgba(185,164,131,.045); border:1px solid var(--glass-brd);
+    color:var(--text-0); font-family:inherit; font-size:13px; outline:none;
+    transition:border-color var(--dur-fast) var(--ease-soft), background var(--dur-fast) var(--ease-soft);}
+  .cw-note input::placeholder{color:var(--text-2);}
+  .cw-note input:focus{border-color:rgba(185,164,131,.5); background:rgba(185,164,131,.09);}
+  /* today glows */
+  .cw-row.today .cw-day{color:#1a1410; border-color:transparent;
+    background:linear-gradient(150deg,#e0d0ac,#bda98a);
+    box-shadow:0 0 18px -4px rgba(203,184,148,.75);}
+  .cw-row.today .cw-note input{border-color:rgba(203,184,148,.6);
+    box-shadow:0 0 18px -6px rgba(203,184,148,.55);}
 
   /* ---------- body weight ---------- */
   .weight-fab{position:absolute; top:-52px; left:0; z-index:60;
@@ -1428,32 +1395,13 @@
 
 <div class="modal-overlay" id="cmdModal">
   <div class="modal-card">
-    <div class="modal-title">وش تبي أسوي؟</div>
-
-    <div class="cmd-mic" id="cmdMic">
-      <div class="cmd-mic-ring"></div>
-      <div class="cmd-mic-ring two"></div>
-      <svg class="cmd-mic-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="9" y="2" width="6" height="12" rx="3"/>
-        <path d="M5 11.5a7 7 0 0 0 14 0"/>
-        <line x1="12" y1="18.5" x2="12" y2="22"/>
-      </svg>
-    </div>
-    <div class="cmd-state" id="cmdState">اضغط الميكروفون أو اكتب أمرك</div>
-
-    <input class="add-input" id="cmdInput" placeholder="نفّذ أمراً أو اسأل سؤالاً" />
-
+    <div class="modal-title">سجّل بسطر واحد</div>
+    <input class="add-input" id="cmdInput" placeholder="صرفت اليوم ١٨ حساب راجحي أكل" />
+    <div class="cmd-state" id="cmdState">اكتب ما تبي تسجّله</div>
     <div class="cmd-preview" id="cmdPreview" style="display:none;"></div>
-    <div class="cmd-answer" id="cmdAnswer" style="display:none;">
-      <div class="cmd-ans-ic">💬</div>
-      <div class="cmd-ans-txt" id="cmdAnsTxt"></div>
-      <button class="cmd-ans-replay" id="cmdReplay" aria-label="أعد">🔊</button>
-    </div>
-
     <div class="modal-actions">
       <button class="modal-btn cancel" id="cmdCancel">إغلاق</button>
-      <button class="modal-btn save" id="cmdRun">تنفيذ</button>
+      <button class="modal-btn save" id="cmdRun">تسجيل</button>
     </div>
   </div>
 </div>
@@ -1506,15 +1454,13 @@
     </div>
     <button class="cmd-bar" id="cmdFab">
       <span class="cmd-bar-ic">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
-             stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="9" y="2.5" width="6" height="11" rx="3"/>
-          <path d="M5.5 11a6.5 6.5 0 0 0 13 0"/>
-          <line x1="12" y1="17.5" x2="12" y2="21"/>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/>
         </svg>
       </span>
-      <span class="cmd-bar-txt">قل أمرك أو اكتبه</span>
-      <span class="cmd-bar-wave"><i></i><i></i><i></i><i></i></span>
+      <span class="cmd-bar-txt">سجّل بسطر واحد</span>
+      <span class="cmd-bar-plus">+</span>
     </button>
 
     <div class="section-head">
@@ -1613,7 +1559,6 @@
       </div>
     </div>
 
-    <div id="finList"></div>
     <div id="finAccountsView">
       <div class="section-head" style="margin-top:0;">
         <div class="section-title">الإدارة المالية</div>
@@ -1776,6 +1721,35 @@
     </div>
   </div>
 
+  <!-- PAGE: CALM -->
+  <div class="page" id="page-calm">
+    <div class="section-head" style="margin-top:0;">
+      <div class="section-title">تأمل</div>
+      <div class="section-sub" id="calmStreak">—</div>
+    </div>
+
+    <div class="calm-ring" id="calmRing">
+      <svg viewBox="0 0 200 200" class="calm-svg">
+        <circle cx="100" cy="100" r="88" class="calm-track"/>
+        <circle cx="100" cy="100" r="88" class="calm-prog" id="calmProg"/>
+      </svg>
+      <div class="calm-mid">
+        <div class="calm-time" id="calmTime">20:00</div>
+        <div class="calm-hint" id="calmHint">اختر المدة وابدأ</div>
+      </div>
+    </div>
+
+    <div class="pick-row" id="calmDurations" style="justify-content:center;"></div>
+
+    <div class="calm-btns">
+      <button class="modal-btn save" id="calmStart">ابدأ</button>
+      <button class="modal-btn cancel" id="calmReset" style="display:none;">إيقاف</button>
+    </div>
+
+    <div class="cmp-head">جدول الأسبوع</div>
+    <div class="calm-week" id="calmWeek"></div>
+  </div>
+
   <!-- PAGE: NOTES -->
   <div class="page" id="page-notes">
     <div class="section-head" style="margin-top:0;">
@@ -1816,6 +1790,7 @@
     <div class="drawer-item" style="--i:6" data-page="purchases"><span class="di-ic">🛍️</span> مشتريات مهمة</div>
     <div class="drawer-item" style="--i:7" data-page="notes"><span class="di-ic">📝</span> ملاحظات</div>
     <div class="drawer-item" style="--i:8" data-page="summary"><span class="di-ic">📊</span> الملخص</div>
+    <div class="drawer-item" style="--i:9" data-page="calm"><span class="di-ic">🧘</span> تأمل</div>
     <div class="drawer-foot">
       <div class="drawer-user" id="drawerUser">—</div>
       <div class="drawer-logout" id="logoutBtn"><span>🔓</span> تسجيل الخروج</div>
@@ -2522,6 +2497,7 @@ function showPage(name){
     if(name==='home' && typeof importTodayWeeklyTasks==='function') importTodayWeeklyTasks();
     if(typeof renderFinTotal === 'function') renderFinTotal();
     if(name === 'summary' && typeof renderSummary === 'function') renderSummary();
+    if(name === 'calm' && typeof renderCalmWeek === 'function'){ renderCalmWeek(); renderCalmStreak(); }
     // restart the entrance + stagger animations on every visit
     next.querySelectorAll('.stagger').forEach(el=>{
       el.style.animation = 'none';
@@ -3318,11 +3294,12 @@ function matchNamed(text, items, getName, minScore){
 }
 
 const CAT_WORDS = {
-  food:['عشا','غدا','فطور','اكل','مطعم','قهوه','كافيه','وجبه','برجر','بقاله','سوبرماركت'],
-  fuel:['بنزين','وقود','محطه','تعبئه','بترول'],
-  shopping:['ملابس','تسوق','شرا','شريت','متجر','ساعه','جوال','حذا'],
-  bills:['فاتوره','كهربا','ماي','نت','اشتراك','ايجار','رسوم'],
-  fun:['سينما','لعبه','ترفيه','رحله','قهوه مع','خروج'],
+  food:['عشا','غدا','فطور','اكل','ماكل','مطعم','قهوه','كافيه','وجبه','برجر','بقاله',
+        'سوبرماركت','تموين','عصير','حلا'],
+  fuel:['بنزين','وقود','محطه','تعبئه','بترول','ديزل'],
+  shopping:['ملابس','تسوق','شرا','شريت','متجر','ساعه','جوال','حذا','عطر','هديه'],
+  bills:['فاتوره','كهربا','ماي','نت','اشتراك','ايجار','رسوم','جوالي','اتصالات'],
+  fun:['سينما','لعبه','ترفيه','رحله','خروج','قيمز','بلايستيشن'],
 };
 function guessCat(text){
   for(const key in CAT_WORDS){
@@ -3445,11 +3422,17 @@ function parseCommand(raw){
   }
 
   const moneyVerb = has('اخصم','خصم','صرفت','صرف','ادفع','دفعت','اشتريت','نزل من',
-                        'ايداع','ودعت','استلمت','راتب','دخل') ||
-                    (has('اضف') && has('ريال','حساب','راتب','رصيد'));
+                        'ايداع','ودعت','استلمت','راتب','دخل','حساب') ||
+                    (has('اضف') && has('ريال','حساب','راتب','رصيد')) ||
+                    // bare shorthand: a number plus a known category word
+                    (extractNumber(t) != null && guessCat(t) !== 'other' && accounts.length > 0);
   if(moneyVerb){
     const income = has('ايداع','راتب','دخل','ودعت','استلمت');
-    let acc = matchNamed(t, accounts, a=>a.name);
+    let acc = null;
+    // "... حساب راجحي ..." names the account explicitly
+    const afterHesab = t.match(/حساب\s+(\S+)/);
+    if(afterHesab) acc = matchNamed(afterHesab[1], accounts, a=>a.name, 45);
+    if(!acc) acc = matchNamed(t, accounts, a=>a.name);
     // "الراجحي" written as "راجحي", and a single account needs no naming
     if(!acc) acc = accounts.find(a=> t.includes(normAr(a.name).replace(/^ال/, '')));
     if(!acc && accounts.length === 1) acc = accounts[0];
@@ -3467,7 +3450,8 @@ function parseCommand(raw){
     const cat = income ? null : guessCat(t);
     // note = leftover words
     const strip = ['اخصم','خصم','صرفت','صرف','ادفع','دفعت','اشتريت','من','على','حساب',
-                   'ريال','ايداع','اضف','ودعت','استلمت','في','الى','لـ','ل'];
+                   'ريال','ايداع','اضف','ودعت','استلمت','في','الى','لـ','ل',
+                   'اليوم','امس','خيار','تصنيف','بند','قسم'];
     let note = t.replace(/\d+(?:[.,]\d+)?/g,' ').replace(normAr(acc.name),' ');
     strip.forEach(w=> note = note.replace(new RegExp('(^|\\s)'+w+'($|\\s)','g'), ' '));
     note = note.replace(/\s+/g,' ').trim();
@@ -3584,245 +3568,21 @@ async function runCommand(cmd){
   return false;
 }
 
-/* ==================================================================
-   QUESTIONS — answers spoken back, using only what is stored locally.
-   ================================================================== */
-/* iOS only allows speech that starts from a real tap, and it loads its
-   voice list asynchronously. So we unlock on the first touch and keep a
-   cached Arabic voice around. */
-let ttsReady = false, arVoice = null, ttsBlocked = false;
-
-function loadVoices(){
-  try{
-    const list = speechSynthesis.getVoices() || [];
-    if(!list.length) return false;
-    arVoice = list.find(v=> /^ar[-_]?sa/i.test(v.lang))
-           || list.find(v=> /^ar/i.test(v.lang))
-           || null;
-    return true;
-  }catch(e){ return false; }
-}
-if('speechSynthesis' in window){
-  loadVoices();
-  try{ speechSynthesis.onvoiceschanged = loadVoices; }catch(e){}
-}
-
-/* call this from inside a click/tap so iOS marks audio as allowed */
-function unlockSpeech(){
-  if(ttsReady || !('speechSynthesis' in window)) return;
-  try{
-    const u = new SpeechSynthesisUtterance(' ');
-    u.volume = 0; u.rate = 1;
-    speechSynthesis.speak(u);
-    ttsReady = true;
-    loadVoices();
-  }catch(e){}
-}
-
-function speak(text){
-  if(!('speechSynthesis' in window)){ ttsBlocked = true; return false; }
-  try{
-    speechSynthesis.cancel();
-    let started = false;
-    const say = ()=>{
-      const u = new SpeechSynthesisUtterance(String(text));
-      u.lang = 'ar-SA'; u.rate = 0.95; u.pitch = 1; u.volume = 1;
-      if(!arVoice) loadVoices();
-      if(arVoice) u.voice = arVoice;
-      u.onstart = ()=>{ started = true; };
-      u.onend   = ()=>{ started = true; };
-      u.onerror = ()=>{ ttsBlocked = true; };
-      speechSynthesis.speak(u);
-    };
-    say();
-    // Safari occasionally drops the very first utterance while it wakes up,
-    // so try once more only if nothing ever began playing
-    setTimeout(()=>{
-      if(started) return;
-      try{ if(!speechSynthesis.speaking && !speechSynthesis.pending) say(); }catch(e){}
-    }, 320);
-    return true;
-  }catch(e){ ttsBlocked = true; return false; }
-}
-const money = n => Math.round(n).toLocaleString('en-US');
-function whenText(dateKey){
-  if(dateKey === todayKey) return 'اليوم';
-  const d = parseLocalDate(dateKey), t = parseLocalDate(todayKey);
-  const days = Math.round((t - d)/86400000);
-  if(days === 1) return 'أمس';
-  if(days < 7)   return `قبل ${days} أيام`;
-  return `${d.getDate()} ${arMonths[d.getMonth()]}`;
-}
-
-/* Try to read the sentence as a question. Returns a spoken answer or null. */
-function answerQuestion(raw){
-  const t = cleanHeard(raw);
-
-  // an action verb means it's a command, not a question
-  const hasAmount = extractNumber(t) != null;
-  // "صرفت ٥٠ بنزين" records something; "كم صرفت" asks about it
-  const isCommand = /(^|\s)(اخصم|ادفع|سجل|اضف|احذف|امسح|كرر|ودعت)(\s|$)/.test(t)
-                 || (hasAmount && /(^|\s)(صرفت|دفعت|اشتريت)(\s|$)/.test(t));
-  if(isCommand) return null;
-
-  const askWord  = /(^|\s)(كم|وش|ايش|متي|كيف|هل|اخر|باقي|وين|اعلي|افضل|قولي|اعرف|اخبار|صار)(\s|$)/.test(t);
-  const topicWord= /(رصيد|فلوس|حساب|صرف|مصروف|مهام|مهمه|اشتراك|هدف|اهداف|وزن|وزني|تمرين|خطوات|ميزانيه)/.test(t)
-                   || /(^|\s)(رصيدي|فلوسي|مهامي|اشتراكاتي|اهدافي|حسابي)(\s|$)/.test(t);
-  if(!askWord && !topicWord) return null;
-
-  /* ---- money ---- */
-  if(/(رصيد|رصيدي|كم عندي|كم في|فلوس|فلوسي|حسابي|حساباتي)/.test(t)){
-    const acc = matchNamed(t, accounts, a=>a.name, 45);
-    if(acc) return `رصيد ${acc.name} ${money(acc.balance)} ريال`;
-    const total = accounts.reduce((s,a)=> s + (Number(a.balance)||0), 0);
-    if(!accounts.length) return 'ما عندك حسابات مسجّلة';
-    return `مجموع حساباتك ${money(total)} ريال في ${accounts.length} حسابات`;
-  }
-  if(/(صرفت|الصرف|مصروف)/.test(t)){
-    const thisMonth = /(الشهر|شهر)/.test(t);
-    const list = thisMonth ? monthExpenses(thisMonthKey())
-                           : (()=>{ const set = new Set(dayKeysBack(7,0)); const out=[];
-                               Object.values(txData).forEach(l=>(l||[]).forEach(x=>{
-                                 if(x.type!=='income' && set.has(x.date)) out.push(x); })); return out; })();
-    const total = sumOf(list);
-    const period = thisMonth ? 'هذا الشهر' : 'آخر أسبوع';
-    if(!total) return `ما صرفت شي ${period}`;
-    if(thisMonth && budget){
-      const left = budget - total;
-      return left >= 0 ? `صرفت ${money(total)} ريال ${period}، باقي لك ${money(left)} من الميزانية`
-                       : `صرفت ${money(total)} ريال ${period}، تجاوزت الميزانية بـ ${money(-left)}`;
-    }
-    return `صرفت ${money(total)} ريال ${period}`;
-  }
-
-  /* ---- tasks ---- */
-  if(/(مهام|مهامي|مهمه|باقي علي|باقي لي|عندي اليوم)/.test(t)){
-    const open = tasks.filter(x=>x.status!=='done');
-    const done = tasks.filter(x=>x.status==='done').length;
-    if(!tasks.length) return 'ما عندك مهام اليوم';
-    if(!open.length)  return `خلّصت كل مهامك اليوم، ${done} مهمة`;
-    const names = open.slice(0,3).map(x=>x.title).join('، ');
-    return `باقي عليك ${open.length} من ${tasks.length}: ${names}`;
-  }
-
-  /* ---- subscriptions ---- */
-  if(/(اشتراك|اشتراكات|اشتراكاتي|يتجدد|مستحق)/.test(t)){
-    const due = subscriptions.filter(x=>!planDone(x))
-      .map(sub=>({ sub, st: subStatus(sub) }))
-      .filter(x=> !x.st.paid && x.st.kind !== 'upcoming')
-      .sort((a,b)=> periodStart(a.sub, a.st.index) - periodStart(b.sub, b.st.index));
-    if(!subscriptions.length) return 'ما عندك اشتراكات مسجّلة';
-    if(!due.length) return 'كل اشتراكاتك مدفوعة';
-    const first = due[0];
-    return `عندك ${due.length} مستحق، أقربها ${first.sub.name} بـ ${money(first.sub.amount)} ريال`;
-  }
-
-  /* ---- body weight ---- */
-  if(/(وزني|وزن الجسم|كم اوزن|ثقلي)/.test(t)){
-    const last = latestWeight();
-    if(!last) return 'ما سجّلت وزنك بعد';
-    const m = weightChange(30);
-    if(!m) return `وزنك ${last.kg} كيلو، سجّلته ${whenText(last.date)}`;
-    if(m.diff === 0) return `وزنك ${last.kg} كيلو، ثابت خلال الشهر`;
-    return `وزنك ${last.kg} كيلو، ${m.diff < 0 ? 'نزلت' : 'زدت'} ${Math.abs(m.diff)} كيلو خلال الشهر`;
-  }
-
-  /* ---- goals ---- */
-  if(/(هدف|اهداف|اهدافي)/.test(t)){
-    const active = goals.filter(g=>!g.done);
-    if(!goals.length)  return 'ما عندك أهداف مسجّلة';
-    if(!active.length) return 'خلّصت كل أهدافك';
-    const g = active.slice().sort((a,b)=> goalEnd(a) - goalEnd(b))[0];
-    const pr = goalProgress(g);
-    return `عندك ${active.length} أهداف، أقربها "${g.name}" باقي له ${pr.left} يوم`;
-  }
-
-
-  /* ---- gym: last / best weight for a muscle or a named exercise ---- */
-  const GW = { chest:['صدر','بنش'], back:['ظهر','سحب'], shoulder:['كتف'],
-               bicep:['باي'], tricep:['تراي'], steps:['خطوات','مشي'] };
-  let group = null;
-  for(const g in GW){ if(GW[g].some(w=> t.includes(w))){ group = g; break; } }
-  let ex = null;
-  // only accept a near-exact exercise name here; loose matches turn ordinary
-  // words like "صار" into "بار"
-  for(const g in gymLibrary){
-    const hit = matchNamed(t, gymLibrary[g] || [], x=>x.label, 95);
-    if(hit){ ex = hit; group = group || g; break; }
-  }
-
-  if(group || ex){
-    const wantBest = /(اعلي|افضل|اقصي|رقم قياسي|احسن|ريكورد)/.test(t);
-    if(ex){
-      const best = exercisePR(ex.key, null);
-      const last = exerciseLast(ex.key, '9999-99-99');
-      const u = unitOf(group || groupOfExercise(ex.key) || 'chest');
-      if(wantBest) return best ? `أعلى رقم على ${ex.label} هو ${best} ${u}` : `ما سجّلت رقم على ${ex.label} بعد`;
-      return last ? `آخر مرة على ${ex.label} كانت ${last.value} ${u}، ${whenText(last.date)}`
-                  : `ما سجّلت ${ex.label} بعد`;
-    }
-    // muscle only: find the most recent entry across that group
-    const keys = (gymLibrary[group] || []).map(x=>x.key);
-    let last = null;
-    Object.keys(gymLog).sort().reverse().some(d=>{
-      for(const k of keys){
-        const n = parseFloat(gymLog[d][k]);
-        if(!isNaN(n)){ last = { d, k, n }; return true; }
-      }
-      return false;
-    });
-    const label = GYM_GROUPS[group].label, u = unitOf(group);
-    if(wantBest){
-      const pr = computePR(group);
-      return pr ? `أعلى رقم في ${label} هو ${pr} ${u}` : `ما فيه أرقام مسجّلة في ${label}`;
-    }
-    return last ? `آخر ${label} كان ${labelOfExercise(last.k)} بـ ${last.n} ${u}، ${whenText(last.d)}`
-                : `ما سجّلت ${label} بعد`;
-  }
-
-  return null;
-}
-
-/* ---- the sheet ---- */
+/* ---- the command sheet (text only) ---- */
 (function initCommands(){
   const modal = document.getElementById('cmdModal');
   const input = document.getElementById('cmdInput');
   const state = document.getElementById('cmdState');
   const prev  = document.getElementById('cmdPreview');
-  const mic   = document.getElementById('cmdMic');
-  let pending = null, rec = null, listening = false;
+  let pending = null;
 
   function setState(msg, bad){
     state.textContent = msg || '';
     state.classList.toggle('err', !!bad);
   }
-  const answer   = document.getElementById('cmdAnswer');
-  const answerTx = document.getElementById('cmdAnsTxt');
-  let lastAnswer = '';
-
-  function showAnswer(text){
-    lastAnswer = text;
-    answerTx.textContent = text;
-    answer.style.display = 'flex';
-    prev.style.display = 'none';
-    pending = null;
-    const spoke = speak(text);
-    setTimeout(()=>{
-      if(!spoke || ttsBlocked) setState('الجواب مكتوب فوق — جهازك ما نطقه', true);
-    }, 700);
-  }
-
   function preview(){
     const raw = input.value.trim();
-    answer.style.display = 'none';
-    if(!raw){ prev.style.display='none'; pending=null; return; }
-
-    // a question is answered out loud rather than executed
-    const ans = answerQuestion(raw);
-    if(ans){ pending = { kind:'answer', text:ans }; prev.style.display='none';
-      answerTx.textContent = ans; answer.style.display='flex';
-      setState('اضغط تنفيذ لسماع الجواب'); return; }
-
+    if(!raw){ prev.style.display='none'; pending=null; setState('اكتب ما تبي تسجّله'); return; }
     const cmd = parseCommand(raw);
     pending = cmd.ok ? cmd : null;
     prev.style.display = 'block';
@@ -3833,124 +3593,27 @@ function answerQuestion(raw){
          <div class="cmd-pv-sub">${esc(cmd.sub || '')}</div>`
       : `<div class="cmd-pv-head">ما قدرت</div>
          <div class="cmd-pv-main">${esc(cmd.why)}</div>
-         <div class="cmd-pv-sub">جرّب واحدة من الأمثلة تحت</div>`;
+         <div class="cmd-pv-sub">مثال: صرفت اليوم ١٨ حساب راجحي أكل</div>`;
+    setState(cmd.ok ? 'راجع السطر تحت واضغط تسجيل' : '');
   }
   input.addEventListener('input', preview);
   input.addEventListener('keydown', e=>{ if(e.key === 'Enter') document.getElementById('cmdRun').click(); });
 
-  /* ---- voice ----
-     Speech engines mishear short Arabic words, so we ask for several
-     alternatives and keep the one the parser actually understands. */
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let silenceTimer = null, gotFinal = false;
-
-  /* pick whichever alternative the parser can actually act on */
-  function bestAlternative(alts){
-    let fallback = alts[0] || '';
-    for(const a of alts){
-      if(answerQuestion(a) || parseCommand(a).ok) return String(a).trim();
-    }
-    return String(fallback).trim();
-  }
-
-  function stopVoice(){
-    clearTimeout(silenceTimer);
-    try{ if(rec) rec.stop(); }catch(e){}
-  }
-  function startVoice(){
-    if(!SR){ setState('جهازك ما يدعم الإدخال الصوتي — اكتب أمرك', true); return; }
-    if(listening){ stopVoice(); return; }
-    try{
-      rec = new SR();
-      rec.lang = 'ar-SA';
-      rec.interimResults = true;
-      rec.continuous = false;
-      rec.maxAlternatives = 5;          // more guesses to choose from
-      gotFinal = false;
-
-      rec.onstart = ()=>{
-        listening = true; gotFinal = false;
-        mic.classList.add('listening');
-        setState('أسمعك… تكلّم بوضوح'); buzz('soft');
-      };
-      rec.onresult = e=>{
-        let interim = '', finalAlts = null;
-        for(let i = e.resultIndex; i < e.results.length; i++){
-          const res = e.results[i];
-          if(res.isFinal){
-            finalAlts = Array.from({length: res.length}, (_, k)=> res[k].transcript);
-          } else {
-            interim += res[0].transcript;
-          }
-        }
-        if(finalAlts){
-          gotFinal = true;
-          input.value = bestAlternative(finalAlts);
-          stopVoice();
-          const spokenAnswer = answerQuestion(input.value);
-          if(spokenAnswer){ showAnswer(spokenAnswer); setState('جوابك فوق'); return; }
-          preview();
-          const cmd = parseCommand(input.value);
-          setState(cmd.ok ? 'راجع الأمر تحت واضغط تنفيذ' : 'ما فهمته تماماً — عدّله بالكتابة', !cmd.ok);
-        } else if(interim.trim()){
-          input.value = String(interim).trim();
-          setState('أسمع: ' + interim.trim());
-          // stop shortly after speech stops instead of hanging on
-          clearTimeout(silenceTimer);
-          silenceTimer = setTimeout(stopVoice, 1300);
-        }
-      };
-      rec.onerror = ev=>{
-        listening = false; mic.classList.remove('listening');
-        clearTimeout(silenceTimer);
-        const msg = ev.error === 'not-allowed'  ? 'لازم تأذن للميكروفون من إعدادات المتصفح'
-                  : ev.error === 'no-speech'    ? 'ما سمعت صوت — قرّب الجوال وحاول'
-                  : ev.error === 'audio-capture'? 'ما لقيت ميكروفون'
-                  : ev.error === 'network'      ? 'التعرف على الصوت يحتاج إنترنت'
-                  : 'ما قدرت أسمع — جرّب مرة ثانية';
-        setState(msg, true);
-      };
-      rec.onend = ()=>{
-        listening = false; mic.classList.remove('listening');
-        clearTimeout(silenceTimer);
-        if(!input.value.trim()) setState('ما سمعت شي — جرّب مرة ثانية', true);
-        else if(!gotFinal){ preview(); setState('راجع الأمر تحت واضغط تنفيذ'); }
-      };
-      rec.start();
-    }catch(e){ setState('تعذّر تشغيل الميكروفون', true); }
-  }
-  mic.addEventListener('click', ()=>{ unlockSpeech(); startVoice(); });
-
   document.getElementById('cmdFab').addEventListener('click', ()=>{
-    unlockSpeech();                       // must happen inside the tap
-    input.value = ''; prev.style.display='none'; pending=null;
-    answer.style.display = 'none';
-    setState(SR ? 'اضغط الميكروفون أو اكتب أمرك' : 'اكتب أمرك');
+    input.value = ''; prev.style.display = 'none'; pending = null;
+    setState('اكتب ما تبي تسجّله');
     modal.classList.add('show');
     setTimeout(()=> input.focus(), 120);
   });
-  const close = ()=>{ try{ if(listening) stopVoice(); }catch(e){}
-    try{ speechSynthesis.cancel(); }catch(e){}
-    modal.classList.remove('show'); };
-  document.getElementById('cmdReplay').addEventListener('click', ()=>{
-    unlockSpeech();
-    if(lastAnswer) speak(lastAnswer);
-  });
+  const close = ()=> modal.classList.remove('show');
   document.getElementById('cmdCancel').addEventListener('click', close);
   modal.addEventListener('click', e=>{ if(e.target === modal) close(); });
 
   document.getElementById('cmdRun').addEventListener('click', async ()=>{
-    if(!pending){ preview(); if(!pending){ setState('ما فهمت الأمر', true); return; } }
-    const cmd = pending;
-    if(cmd.kind === 'answer'){ showAnswer(cmd.text); buzz('soft'); return; }
-    const done = await runCommand(cmd);
-    if(done){
-      buzz('strong');
-      showToast('تم ✓');
-      close();
-    } else {
-      setState('ما قدرت أنفّذ الأمر', true);
-    }
+    if(!pending){ preview(); if(!pending){ setState('ما فهمت — جرّب صيغة أوضح', true); return; } }
+    const done = await runCommand(pending);
+    if(done){ buzz('strong'); showToast('تم ✓'); close(); }
+    else setState('ما قدرت أنفّذ', true);
   });
 })();
 
@@ -4704,6 +4367,145 @@ function renderPrRow(){
     chip.addEventListener('click', ()=> openGymChart(chip.dataset.group));
   });
 }
+
+/* ==================================================================
+   CALM — a plain countdown plus a week planner. The reminder fires
+   twice a day whether or not the app is open at that moment.
+   ================================================================== */
+const CALM_MINUTES = [20, 30, 40, 50, 60];
+let calmPick = store.get('calmPick', 20);
+let calmLeft = calmPick * 60, calmTimer = null, calmRunning = false;
+let calmNotes = store.get('calmNotes', {});   // { 'fri': 'نص' ... }
+
+/* the week starts on Friday and runs to Thursday */
+const CALM_DAYS = [
+  { key:'fri', label:'الجمعة',  js:5 },
+  { key:'sat', label:'السبت',   js:6 },
+  { key:'sun', label:'الأحد',   js:0 },
+  { key:'mon', label:'الاثنين', js:1 },
+  { key:'tue', label:'الثلاثاء',js:2 },
+  { key:'wed', label:'الأربعاء',js:3 },
+  { key:'thu', label:'الخميس',  js:4 },
+];
+
+const fmtClock = sec =>
+  `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+
+function paintCalm(){
+  document.getElementById('calmTime').textContent = fmtClock(Math.max(0, calmLeft));
+  const total = calmPick * 60;
+  const frac = total ? (total - calmLeft) / total : 0;
+  const C = 2 * Math.PI * 88;
+  document.getElementById('calmProg').style.strokeDashoffset = String(C * (1 - frac));
+  document.getElementById('calmRing').classList.toggle('running', calmRunning);
+  document.getElementById('calmStart').textContent = calmRunning ? 'إيقاف مؤقت' : 'ابدأ';
+  document.getElementById('calmReset').style.display =
+    (calmRunning || calmLeft !== calmPick*60) ? 'block' : 'none';
+  document.getElementById('calmHint').textContent =
+    calmRunning ? 'خذ نفساً عميقاً…' : (calmLeft === calmPick*60 ? 'اختر المدة وابدأ' : 'متوقفة مؤقتاً');
+}
+function buildCalmDurations(){
+  const row = document.getElementById('calmDurations');
+  row.innerHTML = '';
+  CALM_MINUTES.forEach(m=>{
+    const chip = document.createElement('div');
+    chip.className = 'cat-chip' + (m === calmPick ? ' active' : '');
+    chip.style.setProperty('--chip-c', 'var(--gold)');
+    chip.textContent = m === 60 ? 'ساعة' : `${m} د`;
+    chip.addEventListener('click', ()=>{
+      if(calmRunning) return;
+      calmPick = m; store.set('calmPick', m);
+      calmLeft = m * 60;
+      buildCalmDurations(); paintCalm();
+    });
+    row.appendChild(chip);
+  });
+}
+function calmTick(){
+  calmLeft--;
+  if(calmLeft <= 0){
+    calmLeft = 0; stopCalm(true);
+    buzz('strong');
+    setTimeout(()=> buzz('strong'), 500);
+    setTimeout(()=> buzz('strong'), 1000);
+    showToast('انتهت جلسة التأمل 🧘', { top:true, ms:4000 });
+    const done = store.get('calmDone', {});
+    done[todayKey] = (done[todayKey] || 0) + 1;
+    store.set('calmDone', done);
+    renderCalmStreak();
+    calmLeft = calmPick * 60;
+  }
+  paintCalm();
+}
+function startCalm(){
+  if(calmRunning){ stopCalm(); return; }
+  calmRunning = true;
+  clearInterval(calmTimer);
+  calmTimer = setInterval(calmTick, 1000);
+  buzz(); paintCalm();
+}
+function stopCalm(finished){
+  calmRunning = false;
+  clearInterval(calmTimer); calmTimer = null;
+  if(!finished) paintCalm();
+}
+function resetCalm(){ stopCalm(); calmLeft = calmPick * 60; paintCalm(); }
+
+function renderCalmStreak(){
+  const done = store.get('calmDone', {});
+  const n = done[todayKey] || 0;
+  const total = Object.keys(done).length;
+  document.getElementById('calmStreak').textContent =
+    n ? `${n} جلسة اليوم` : (total ? `${total} يوم سابق` : '—');
+}
+
+function renderCalmWeek(){
+  const wrap = document.getElementById('calmWeek');
+  const todayJs = new Date().getDay();
+  wrap.innerHTML = CALM_DAYS.map(d=>`
+    <div class="cw-row${d.js === todayJs ? ' today' : ''}">
+      <div class="cw-day">${d.label}</div>
+      <div class="cw-note">
+        <input data-day="${d.key}" placeholder="اكتب هنا…" value="${esc(calmNotes[d.key] || '')}" />
+      </div>
+    </div>`).join('');
+  wrap.querySelectorAll('input[data-day]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      calmNotes[inp.dataset.day] = inp.value;
+      store.set('calmNotes', calmNotes);
+    });
+  });
+}
+
+document.getElementById('calmStart').addEventListener('click', startCalm);
+document.getElementById('calmReset').addEventListener('click', resetCalm);
+buildCalmDurations(); paintCalm(); renderCalmStreak(); renderCalmWeek();
+
+/* ---- twice-daily breathing reminder ----
+   Fires the first time the app is open after each window, so you get it
+   at most twice a day no matter how often you open the app. */
+const BREATH_SLOTS = [
+  { id:'am', from: 9,  to: 12, text:'🌤️ لا تنسى تمارين التنفس' },
+  { id:'pm', from:19,  to: 23, text:'🌙 وقت تمارين التنفس' },
+];
+function breathReminder(){
+  const now = new Date();
+  const h = now.getHours();
+  const slot = BREATH_SLOTS.find(s=> h >= s.from && h < s.to);
+  if(!slot) return;
+  const stamp = `${toDateKey(now)}:${slot.id}`;
+  const log = store.get('breathLog', {});
+  if(log[stamp]) return;
+  log[stamp] = true;
+  // keep only the last few days
+  const keys = Object.keys(log).sort();
+  while(keys.length > 8) delete log[keys.shift()];
+  store.set('breathLog', log);
+  setTimeout(()=>{ buzz(); showToast(slot.text, { top:true, ms:4000 }); }, 3400);
+}
+breathReminder();
+setInterval(breathReminder, 10 * 60 * 1000);
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) breathReminder(); });
 
 /* ---- body weight ----
    One reading a week is plenty. If the newest entry is older than seven
