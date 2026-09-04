@@ -826,22 +826,26 @@
   /* week grid */
   .calm-week{display:flex; flex-direction:column; gap:7px;}
   .cw-row{display:flex; align-items:stretch; gap:7px;}
-  .cw-day{flex:0 0 62px; display:flex; align-items:center; justify-content:center;
+  .cw-day{flex:0 0 56px; display:flex; align-items:center; justify-content:center;
     border-radius:13px; font-size:11.5px; font-weight:700; color:var(--text-1);
     background:rgba(185,164,131,.06); border:1px solid var(--glass-brd); text-align:center;}
+  .cw-tag{flex:0 0 92px;}
   .cw-note{flex:1; min-width:0;}
-  .cw-note input{width:100%; height:100%; min-height:42px; padding:10px 13px; border-radius:13px;
+  .cw-tag input, .cw-note input{width:100%; height:100%; min-height:42px;
+    padding:10px 12px; border-radius:13px;
     background:rgba(185,164,131,.045); border:1px solid var(--glass-brd);
     color:var(--text-0); font-family:inherit; font-size:13px; outline:none;
     transition:border-color var(--dur-fast) var(--ease-soft), background var(--dur-fast) var(--ease-soft);}
-  .cw-note input::placeholder{color:var(--text-2);}
-  .cw-note input:focus{border-color:rgba(185,164,131,.5); background:rgba(185,164,131,.09);}
+  .cw-tag input{font-size:12px; text-align:center; font-weight:600;}
+  .cw-tag input::placeholder, .cw-note input::placeholder{color:var(--text-2); font-weight:400;}
+  .cw-tag input:focus, .cw-note input:focus{
+    border-color:rgba(185,164,131,.5); background:rgba(185,164,131,.09);}
   /* today glows */
   .cw-row.today .cw-day{color:#1a1410; border-color:transparent;
     background:linear-gradient(150deg,#e0d0ac,#bda98a);
     box-shadow:0 0 18px -4px rgba(203,184,148,.75);}
-  .cw-row.today .cw-note input{border-color:rgba(203,184,148,.6);
-    box-shadow:0 0 18px -6px rgba(203,184,148,.55);}
+  .cw-row.today .cw-tag input, .cw-row.today .cw-note input{
+    border-color:rgba(203,184,148,.6); box-shadow:0 0 18px -6px rgba(203,184,148,.55);}
 
   /* ---------- body weight ---------- */
   .weight-fab{position:absolute; top:-52px; left:0; z-index:60;
@@ -1789,8 +1793,8 @@
     <div class="drawer-item" style="--i:5" data-page="goals"><span class="di-ic">🎯</span> الأهداف طويلة المدى</div>
     <div class="drawer-item" style="--i:6" data-page="purchases"><span class="di-ic">🛍️</span> مشتريات مهمة</div>
     <div class="drawer-item" style="--i:7" data-page="notes"><span class="di-ic">📝</span> ملاحظات</div>
-    <div class="drawer-item" style="--i:8" data-page="summary"><span class="di-ic">📊</span> الملخص</div>
-    <div class="drawer-item" style="--i:9" data-page="calm"><span class="di-ic">🧘</span> تأمل</div>
+    <div class="drawer-item" style="--i:8" data-page="calm"><span class="di-ic">🧘</span> تأمل</div>
+    <div class="drawer-item" style="--i:9" data-page="summary"><span class="di-ic">📊</span> الملخص</div>
     <div class="drawer-foot">
       <div class="drawer-user" id="drawerUser">—</div>
       <div class="drawer-logout" id="logoutBtn"><span>🔓</span> تسجيل الخروج</div>
@@ -4375,7 +4379,11 @@ function renderPrRow(){
 const CALM_MINUTES = [20, 30, 40, 50, 60];
 let calmPick = store.get('calmPick', 20);
 let calmLeft = calmPick * 60, calmTimer = null, calmRunning = false;
-let calmNotes = store.get('calmNotes', {});   // { 'fri': 'نص' ... }
+let calmNotes = store.get('calmNotes', {});   // { fri:{tag,note} ... }
+// earlier versions stored a plain string per day
+Object.keys(calmNotes).forEach(k=>{
+  if(typeof calmNotes[k] === 'string') calmNotes[k] = { tag:'', note: calmNotes[k] };
+});
 
 /* the week starts on Friday and runs to Thursday */
 const CALM_DAYS = [
@@ -4465,13 +4473,20 @@ function renderCalmWeek(){
   wrap.innerHTML = CALM_DAYS.map(d=>`
     <div class="cw-row${d.js === todayJs ? ' today' : ''}">
       <div class="cw-day">${d.label}</div>
+      <div class="cw-tag">
+        <input data-day="${d.key}" data-field="tag" maxlength="14"
+               placeholder="كلمتين" value="${esc((calmNotes[d.key] || {}).tag || '')}" />
+      </div>
       <div class="cw-note">
-        <input data-day="${d.key}" placeholder="اكتب هنا…" value="${esc(calmNotes[d.key] || '')}" />
+        <input data-day="${d.key}" data-field="note"
+               placeholder="اكتب هنا…" value="${esc((calmNotes[d.key] || {}).note || '')}" />
       </div>
     </div>`).join('');
   wrap.querySelectorAll('input[data-day]').forEach(inp=>{
     inp.addEventListener('input', ()=>{
-      calmNotes[inp.dataset.day] = inp.value;
+      const k = inp.dataset.day;
+      calmNotes[k] = calmNotes[k] || {};
+      calmNotes[k][inp.dataset.field] = inp.value;
       store.set('calmNotes', calmNotes);
     });
   });
