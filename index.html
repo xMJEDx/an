@@ -803,6 +803,48 @@
     font-variant-numeric:tabular-nums;}
   .cat-pct{font-size:9.5px; color:var(--text-2); flex:0 0 30px; text-align:end;}
 
+  /* ---------- day planner ---------- */
+  .plan-pool{display:flex; gap:7px; flex-wrap:wrap; padding:12px; margin-bottom:14px;
+    border-radius:18px; min-height:56px; align-content:flex-start;
+    background:linear-gradient(150deg, rgba(185,164,131,.07), rgba(185,164,131,.02) 62%, transparent);
+    border:1px dashed var(--glass-brd-strong);}
+  .plan-pool.empty-pool{align-items:center; justify-content:center;
+    font-size:11.5px; color:var(--text-2);}
+  .pp-chip{display:flex; align-items:center; gap:6px; padding:9px 13px; border-radius:99px;
+    cursor:pointer; font-size:12.5px; font-weight:600; color:var(--text-0);
+    background:color-mix(in srgb, var(--pp-c) 22%, transparent);
+    border:1px solid color-mix(in srgb, var(--pp-c) 42%, transparent);
+    transition:transform var(--dur-fast) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-soft);}
+  .pp-chip:active{transform:scale(.93);}
+  .pp-chip.picked{box-shadow:0 0 0 2px var(--pp-c), 0 6px 18px -8px var(--pp-c);}
+  .pp-dot{width:8px; height:8px; border-radius:50%; background:var(--pp-c); flex:0 0 auto;}
+
+  .plan-grid{display:flex; flex-direction:column; gap:5px;}
+  .ph-row{display:flex; align-items:stretch; gap:7px; min-height:44px;}
+  .ph-time{flex:0 0 58px; display:flex; align-items:center; justify-content:center;
+    border-radius:12px; font-size:11px; font-weight:700; color:var(--text-2);
+    background:rgba(185,164,131,.05); border:1px solid var(--glass-brd);
+    font-variant-numeric:tabular-nums;}
+  .ph-slot{flex:1; min-width:0; border-radius:12px; cursor:pointer;
+    display:flex; align-items:center; gap:8px; padding:8px 12px;
+    background:rgba(185,164,131,.03); border:1px dashed var(--glass-brd);
+    transition:background var(--dur-fast) var(--ease-soft), border-color var(--dur-fast) var(--ease-soft),
+      transform var(--dur-fast) var(--ease-spring);}
+  .ph-slot:active{transform:scale(.99);}
+  .ph-slot.filled{border-style:solid; border-color:color-mix(in srgb, var(--ph-c) 45%, transparent);
+    background:linear-gradient(100deg, color-mix(in srgb, var(--ph-c) 24%, transparent),
+      color-mix(in srgb, var(--ph-c) 8%, transparent));}
+  .ph-slot.filled.mid{border-top-color:transparent; border-top-left-radius:0; border-top-right-radius:0;}
+  .ph-txt{flex:1; min-width:0; font-size:12.5px; color:var(--text-1);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ph-slot.filled .ph-txt{color:var(--text-0); font-weight:600;}
+  .ph-x{width:22px; height:22px; border-radius:50%; flex:0 0 auto; cursor:pointer; padding:0;
+    font-size:9px; color:var(--text-1);
+    background:rgba(12,10,8,.4); border:1px solid var(--glass-brd);}
+  .ph-row.now .ph-time{color:#1a1410; border-color:transparent;
+    background:linear-gradient(150deg,#e0d0ac,#bda98a);
+    box-shadow:0 0 16px -4px rgba(203,184,148,.7);}
+
   /* ---------- calm / breathing ---------- */
   .calm-ring{position:relative; width:min(72vw, 230px); aspect-ratio:1; margin:6px auto 18px;}
   .calm-svg{width:100%; height:100%; transform:rotate(-90deg);}
@@ -1369,7 +1411,7 @@
 <!-- ===== LOCK SCREEN ===== -->
 <div class="lock" id="lockScreen">
   <div class="lock-card">
-    <div class="lock-mono">MR</div>
+    <div class="lock-mono">MF</div>
     <div class="lock-title" id="lockTitle">تسجيل الدخول</div>
     <div class="lock-sub" id="lockSub">بياناتك مشفّرة ومزامَنة بين أجهزتك</div>
 
@@ -1426,7 +1468,7 @@
 
   <div class="topbar">
     <button class="hamburger" id="menuBtn">☰</button>
-    <div class="brand-badge"><span class="brand-mono">MR</span></div>
+    <div class="brand-badge"><span class="brand-mono">MF</span></div>
     <div style="width:42px"></div>
   </div>
 
@@ -1475,6 +1517,18 @@
       <span class="ata-plus">+</span> أضف مهمة جديدة
     </button>
     <div id="taskList" class="stagger"></div>
+  </div>
+
+  <!-- PAGE: DAY PLAN -->
+  <div class="page" id="page-plan">
+    <div class="section-head" style="margin-top:0;">
+      <div class="section-title">يومي مفصّل</div>
+      <div class="section-sub" id="planMeta">—</div>
+    </div>
+
+    <div class="plan-pool" id="planPool"></div>
+
+    <div class="plan-grid" id="planGrid"></div>
   </div>
 
   <!-- PAGE: WEEK -->
@@ -1783,18 +1837,19 @@
 <div class="drawer-overlay" id="drawerOverlay">
   <div class="drawer">
     <div class="drawer-head">القائمة</div>
-    <div class="drawer-sub">MR</div>
+    <div class="drawer-sub">MF</div>
     <div class="drawer-rule"></div>
     <div class="drawer-item" style="--i:0" data-page="home"><span class="di-ic">🏛️</span> الصفحة الرئيسية</div>
-    <div class="drawer-item" style="--i:1" data-page="week"><span class="di-ic">🗓️</span> المهام الأسبوعية</div>
-    <div class="drawer-item" style="--i:2" data-page="gym"><span class="di-ic">🏋️</span> النادي</div>
-    <div class="drawer-item" style="--i:3" data-page="finance"><span class="di-ic">💰</span> الإدارة المالية</div>
-    <div class="drawer-item" style="--i:4" data-page="subs"><span class="di-ic">💳</span> الاشتراكات</div>
-    <div class="drawer-item" style="--i:5" data-page="goals"><span class="di-ic">🎯</span> الأهداف طويلة المدى</div>
-    <div class="drawer-item" style="--i:6" data-page="purchases"><span class="di-ic">🛍️</span> مشتريات مهمة</div>
-    <div class="drawer-item" style="--i:7" data-page="notes"><span class="di-ic">📝</span> ملاحظات</div>
-    <div class="drawer-item" style="--i:8" data-page="calm"><span class="di-ic">🧘</span> تأمل</div>
-    <div class="drawer-item" style="--i:9" data-page="summary"><span class="di-ic">📊</span> الملخص</div>
+    <div class="drawer-item" style="--i:1" data-page="plan"><span class="di-ic">🕐</span> يومي مفصّل</div>
+    <div class="drawer-item" style="--i:2" data-page="week"><span class="di-ic">🗓️</span> المهام الأسبوعية</div>
+    <div class="drawer-item" style="--i:3" data-page="gym"><span class="di-ic">🏋️</span> النادي</div>
+    <div class="drawer-item" style="--i:4" data-page="finance"><span class="di-ic">💰</span> الإدارة المالية</div>
+    <div class="drawer-item" style="--i:5" data-page="subs"><span class="di-ic">💳</span> الاشتراكات</div>
+    <div class="drawer-item" style="--i:6" data-page="goals"><span class="di-ic">🎯</span> الأهداف طويلة المدى</div>
+    <div class="drawer-item" style="--i:7" data-page="purchases"><span class="di-ic">🛍️</span> مشتريات مهمة</div>
+    <div class="drawer-item" style="--i:8" data-page="notes"><span class="di-ic">📝</span> ملاحظات</div>
+    <div class="drawer-item" style="--i:9" data-page="calm"><span class="di-ic">🧘</span> تأمل</div>
+    <div class="drawer-item" style="--i:10" data-page="summary"><span class="di-ic">📊</span> الملخص</div>
     <div class="drawer-foot">
       <div class="drawer-user" id="drawerUser">—</div>
       <div class="drawer-logout" id="logoutBtn"><span>🔓</span> تسجيل الخروج</div>
@@ -2502,6 +2557,7 @@ function showPage(name){
     if(typeof renderFinTotal === 'function') renderFinTotal();
     if(name === 'summary' && typeof renderSummary === 'function') renderSummary();
     if(name === 'calm' && typeof renderCalmWeek === 'function'){ renderCalmWeek(); renderCalmStreak(); }
+    if(name === 'plan' && typeof renderPlan === 'function'){ planPick = null; renderPlan(); }
     // restart the entrance + stagger animations on every visit
     next.querySelectorAll('.stagger').forEach(el=>{
       el.style.animation = 'none';
@@ -3928,6 +3984,125 @@ function makeSwipable(el, onDelete, label){
   el.addEventListener('pointerdown', e=>{ if(e.pointerType === 'mouse') start(e); });
   el.addEventListener('pointermove', e=>{ if(e.pointerType === 'mouse') move(e); });
   el.addEventListener('pointerup',   e=>{ if(e.pointerType === 'mouse') end(e); });
+}
+
+/* ==================================================================
+   DAY PLANNER — lay today's tasks onto an hourly grid.
+   The tasks come straight from the home page, so anything that arrived
+   from the weekly planner shows up here too.
+   ================================================================== */
+const PLAN_START = 6, PLAN_END = 24;          // 6am through midnight
+const PLAN_COLORS = ['#a85c3a','#2f6b56','#39496e','#6b4a73','#8a6d3a','#8a3341','#4f7a5c','#ab9670'];
+let planPick = null;                           // task id waiting to be placed
+let planData = store.get('planData', {});      // { 'YYYY-MM-DD': { '13': taskId } }
+
+function planDay(){ planData[todayKey] = planData[todayKey] || {}; return planData[todayKey]; }
+function planColorOf(taskId){
+  const i = tasks.findIndex(t=>t.id === taskId);
+  return PLAN_COLORS[(i < 0 ? 0 : i) % PLAN_COLORS.length];
+}
+function planTask(id){ return tasks.find(t=>t.id === id) || null; }
+const hourLabel = h => {
+  const hh = h % 24;
+  const ampm = hh < 12 ? 'ص' : 'م';
+  const twelve = hh % 12 === 0 ? 12 : hh % 12;
+  return `${twelve} ${ampm}`;
+};
+
+function renderPlanPool(){
+  const pool = document.getElementById('planPool');
+  const day = planDay();
+  const placed = new Set(Object.values(day));
+  const left = tasks.filter(t=> t.status !== 'done' && !placed.has(t.id));
+
+  pool.innerHTML = '';
+  pool.classList.toggle('empty-pool', left.length === 0);
+  if(!tasks.length){
+    pool.textContent = 'ما فيه مهام اليوم — أضفها من الصفحة الرئيسية';
+    return;
+  }
+  if(!left.length){
+    pool.textContent = 'كل مهامك موزّعة على الجدول ✓';
+    return;
+  }
+  left.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'pp-chip' + (planPick === t.id ? ' picked' : '');
+    chip.style.setProperty('--pp-c', planColorOf(t.id));
+    chip.innerHTML = `<span class="pp-dot"></span><span>${esc(t.title)}</span>`;
+    chip.addEventListener('click', ()=>{
+      planPick = (planPick === t.id) ? null : t.id;
+      buzz('soft');
+      renderPlan();
+    });
+    pool.appendChild(chip);
+  });
+}
+
+function renderPlanGrid(){
+  const grid = document.getElementById('planGrid');
+  const day = planDay();
+  const nowH = new Date().getHours();
+  grid.innerHTML = '';
+
+  for(let h = PLAN_START; h < PLAN_END; h++){
+    const id = day[h];
+    const t  = id ? planTask(id) : null;
+    if(id && !t){ delete day[h]; }             // task was deleted elsewhere
+
+    const row = document.createElement('div');
+    row.className = 'ph-row' + (h === nowH ? ' now' : '');
+    const contFromAbove = t && day[h-1] === id;
+
+    row.innerHTML = `
+      <div class="ph-time">${hourLabel(h)}</div>
+      <div class="ph-slot${t ? ' filled' : ''}${contFromAbove ? ' mid' : ''}"
+           style="${t ? `--ph-c:${planColorOf(id)}` : ''}" data-h="${h}">
+        <div class="ph-txt">${t ? (contFromAbove ? '' : esc(t.title)) : (planPick ? 'ضعها هنا' : '')}</div>
+        ${t ? `<button class="ph-x" data-clear="${h}" aria-label="إزالة">✕</button>` : ''}
+      </div>`;
+    grid.appendChild(row);
+  }
+
+  grid.querySelectorAll('.ph-slot').forEach(slot=>{
+    slot.addEventListener('click', e=>{
+      if(e.target.closest('.ph-x')) return;
+      const h = slot.dataset.h;
+      const day = planDay();
+      if(planPick){
+        day[h] = planPick;
+        store.set('planData', planData);
+        buzz();
+        renderPlan();
+      } else if(day[h]){
+        // tapping a filled hour picks it up so you can extend or move it
+        planPick = day[h];
+        renderPlan();
+      }
+    });
+  });
+  grid.querySelectorAll('.ph-x').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      delete planDay()[btn.dataset.clear];
+      store.set('planData', planData);
+      renderPlan();
+    });
+  });
+}
+
+function renderPlan(){
+  // drop any hours whose task no longer exists, and yesterday's plans
+  Object.keys(planData).forEach(k=>{
+    if(k < toDateKey(new Date(Date.now() - 30*86400000))) delete planData[k];
+  });
+  renderPlanPool();
+  renderPlanGrid();
+  const day = planDay();
+  const used = Object.keys(day).length;
+  const open = tasks.filter(t=>t.status !== 'done').length;
+  document.getElementById('planMeta').textContent =
+    tasks.length ? `${used} ساعة موزّعة · ${open} مهمة` : '—';
 }
 
 /* ---- repeating tasks ----
