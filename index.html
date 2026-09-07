@@ -52,7 +52,7 @@
   body{-webkit-overflow-scrolling:touch; overscroll-behavior-y:none;}
   /* taps shouldn't select text or lag 300ms */
   .task, .goal-card, .purch-item, .sub-card, .acc-card, .period-row,
-  .day-tab, .gym-section-tab, .cat-chip, .drawer-item, .slot-add,
+  .day-tab, .cat-chip, .drawer-item, .slot-add,
   button, .tbtn, .color-dot{
     touch-action:manipulation;
     -webkit-user-select:none; user-select:none;}
@@ -344,7 +344,7 @@
   .mini-toast.top.show{transform:translate(-50%, 0);}
 
   .page{display:none;}
-  .page.active{display:block; animation:pageIn .5s var(--ease-out) both;}
+  .page.active{display:block; animation:pageIn .34s var(--ease-out) both;}
   /* pages drift in from the leading edge, so navigation reads directionally */
   @keyframes pageIn{
     from{opacity:0; transform:translate3d(26px, 6px, 0) scale(.985);}
@@ -352,7 +352,7 @@
   }
   /* the outgoing page slides the other way before it is swapped out */
   .page.leaving{display:block; pointer-events:none;
-    animation:pageOut .22s var(--ease-soft) both;}
+    animation:pageOut .15s var(--ease-soft) both;}
   @keyframes pageOut{
     from{opacity:1; transform:translate3d(0,0,0) scale(1);}
     to{opacity:0; transform:translate3d(-18px, 0, 0) scale(.99);}
@@ -362,23 +362,23 @@
     from{opacity:0; transform:translateY(8px);}
     to{opacity:1; transform:translateY(0);}
   }
-  .stagger > *{animation:itemIn .46s var(--ease-out) both;}
-  .stagger > *:nth-child(1){animation-delay:.04s;}
-  .stagger > *:nth-child(2){animation-delay:.09s;}
-  .stagger > *:nth-child(3){animation-delay:.14s;}
-  .stagger > *:nth-child(4){animation-delay:.19s;}
-  .stagger > *:nth-child(5){animation-delay:.23s;}
-  .stagger > *:nth-child(6){animation-delay:.27s;}
-  .stagger > *:nth-child(7){animation-delay:.30s;}
-  .stagger > *:nth-child(8){animation-delay:.33s;}
-  .stagger > *:nth-child(n+9){animation-delay:.36s;}
+  .stagger > *{animation:itemIn .34s var(--ease-out) both;}
+  .stagger > *:nth-child(1){animation-delay:.03s;}
+  .stagger > *:nth-child(2){animation-delay:.06s;}
+  .stagger > *:nth-child(3){animation-delay:.09s;}
+  .stagger > *:nth-child(4){animation-delay:.12s;}
+  .stagger > *:nth-child(5){animation-delay:.15s;}
+  .stagger > *:nth-child(6){animation-delay:.17s;}
+  .stagger > *:nth-child(7){animation-delay:.19s;}
+  .stagger > *:nth-child(8){animation-delay:.21s;}
+  .stagger > *:nth-child(n+9){animation-delay:.23s;}
 
   /* ---------- drawer ---------- */
   .drawer-overlay{position:fixed; inset:0; overflow:hidden; z-index:200;
     background:rgba(6,5,3,0.62);
     backdrop-filter:blur(14px) saturate(115%); -webkit-backdrop-filter:blur(14px) saturate(115%);
     opacity:0; visibility:hidden;
-    transition:opacity .42s var(--ease-soft), visibility .42s;}
+    transition:opacity .3s var(--ease-soft), visibility .3s;}
   .drawer-overlay.show{opacity:1; visibility:visible;}
 
   .drawer{position:absolute; top:0; bottom:0; right:0;
@@ -388,7 +388,7 @@
     background:linear-gradient(165deg,#191309 0%,#120e09 55%,#0b0907 100%);
     box-shadow:-34px 0 80px -34px rgba(0,0,0,.95), -1px 0 0 rgba(185,164,131,.14) inset;
     transform:translateX(102%);
-    transition:transform .52s cubic-bezier(0.32,0.9,0.28,1);
+    transition:transform .36s cubic-bezier(0.32,0.9,0.28,1);
     overflow-y:auto; -webkit-overflow-scrolling:touch;}
   .drawer-overlay.show .drawer{transform:translateX(0);}
   /* soft gold seam down the opening edge */
@@ -420,8 +420,16 @@
     transition:background .22s var(--ease-soft), color .22s var(--ease-soft),
       border-color .22s var(--ease-soft), transform .16s var(--ease-spring);
     opacity:0;}
-  .drawer-overlay.show .drawer-item{animation:drawerItemIn .46s var(--ease-out) both;}
-  .drawer-overlay.show .drawer-item{animation-delay:calc(.04s + var(--i, 0) * .045s);}
+  .drawer-overlay.show .drawer-item{animation:drawerItemIn .34s var(--ease-out) both;}
+  .drawer-overlay.show .drawer-item{animation-delay:calc(.03s + var(--i, 0) * .032s);}
+  /* thin rule that groups the menu into sections */
+
+  /* thin rule that groups the menu into sections */
+  .drawer-sep{flex:0 0 2px; height:2px; margin:7px 10px; border-radius:2px; opacity:0;
+    background:linear-gradient(90deg, transparent, rgba(203,184,148,.7) 15%,
+      rgba(203,184,148,.7) 85%, transparent);}
+  .drawer-overlay.show .drawer-sep{animation:drawerItemIn .34s var(--ease-out) both;
+    animation-delay:calc(.03s + var(--i, 0) * .032s);}
   @keyframes drawerItemIn{
     from{opacity:0; transform:translateX(22px);}
     to{opacity:1; transform:translateX(0);}
@@ -805,6 +813,48 @@
     font-variant-numeric:tabular-nums;}
   .cat-pct{font-size:9.5px; color:var(--text-2); flex:0 0 30px; text-align:end;}
 
+  .buy-hint{font-size:11.5px; color:var(--text-2); margin-top:8px; line-height:1.7; text-align:center;}
+
+  /* ---------- category detail & transaction detail ---------- */
+  .cat-chip{position:relative;}
+  .cat-del{width:19px; height:19px; border-radius:50%; font-size:8px; cursor:pointer; padding:0;
+    margin-inline-start:5px; flex:0 0 auto; touch-action:manipulation;
+    background:rgba(138,51,65,.32); border:1px solid rgba(138,51,65,.5); color:#f5dede;}
+  .cat-del::after{content:''; position:absolute; inset:-8px; border-radius:50%;}
+  .cat-chip.cat-add{color:var(--gold); border-style:dashed;}
+
+  .cd-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:10px;}
+  .cd-label{font-size:9.5px; color:var(--text-2); letter-spacing:1.4px; font-weight:700;}
+  .cd-total{font-family:'Amiri',serif; font-size:27px; font-weight:700; line-height:1.15; margin-top:3px;
+    background:linear-gradient(100deg,#ece5d7,#b9a483);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .cd-cmp{font-size:11.5px; color:var(--text-1); margin-bottom:12px; line-height:1.7;}
+  .cd-cmp b.up{color:#e39b9b;} .cd-cmp b.down{color:#8fbfa4;}
+  .cd-list{max-height:230px; overflow-y:auto;}
+  .cd-row{display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 13px; margin-bottom:6px; border-radius:14px;
+    background:rgba(185,164,131,.05); border:1px solid var(--glass-brd);}
+  .cd-when{font-size:10.5px; color:var(--text-2); flex:0 0 58px;}
+  .cd-note{flex:1; min-width:0; font-size:12.5px; color:var(--text-0);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .cd-amt{font-size:12.5px; font-weight:700; color:#c99; font-variant-numeric:tabular-nums;}
+
+  .td-amount{text-align:center; font-family:'Amiri',serif; font-size:34px; font-weight:700;
+    line-height:1.2; margin-bottom:16px;}
+  .td-amount.expense{background:linear-gradient(100deg,#f0c4c4,#c17a7a);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .td-amount.income{background:linear-gradient(100deg,#bfe2cf,#6ca386);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .td-rows{display:flex; flex-direction:column; gap:7px;}
+  .td-row{display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 14px; border-radius:15px;
+    background:rgba(185,164,131,.05); border:1px solid var(--glass-brd);}
+  .td-k{font-size:11.5px; color:var(--text-2);}
+  .td-v{font-size:13px; font-weight:700; color:var(--text-0); font-variant-numeric:tabular-nums;}
+  .td-row.hi{background:linear-gradient(150deg, rgba(185,164,131,.14), transparent 62%);
+    border-color:var(--glass-brd-strong);}
+  .td-row.hi .td-v{font-family:'Amiri',serif; font-size:18px;}
+
   /* ---------- day planner ---------- */
   .plan-hint{font-size:11.5px; color:var(--text-2); margin-bottom:10px; letter-spacing:.3px;
     display:flex; align-items:center; gap:7px;}
@@ -997,6 +1047,10 @@
   .fin-total-label{font-size:8.5px; color:var(--text-2); letter-spacing:1.4px; font-weight:700;}
   .fin-total-val{font-family:'Amiri',serif; font-size:19px; font-weight:700; line-height:1.2; margin-top:2px;
     background:linear-gradient(100deg,#ece5d7,#b9a483);
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  /* sits just above the accounts total */
+  .fin-spent{bottom:calc(80px + env(safe-area-inset-bottom));}
+  .fin-spent .fin-total-val{background:linear-gradient(100deg,#f0c4c4,#c17a7a);
     -webkit-background-clip:text; background-clip:text; color:transparent;}
 
   /* ---------- subscriptions ---------- */
@@ -1417,7 +1471,7 @@
       border-color:var(--glass-brd-strong);}
     .tbtn:hover, .task-check:hover, .goal-check:hover,
     .purch-check:hover, .sub-pay:hover{background:rgba(185,164,131,.14);}
-    .cat-chip:hover, .day-tab:hover, .gym-section-tab:hover,
+    .cat-chip:hover, .day-tab:hover,
     .slot-add:hover, .add-task-btn:hover{background:rgba(185,164,131,.11);}
 
     /* bleed a little past the column so the fade happens off-content */
@@ -1480,6 +1534,11 @@
       <button class="modal-btn save" id="cmdRun">تسجيل</button>
     </div>
   </div>
+</div>
+
+<div class="fin-total fin-spent" id="finSpent">
+  <div class="fin-total-label">إجمالي الصرف</div>
+  <div class="fin-total-val" id="finSpentVal">—</div>
 </div>
 
 <div class="fin-total" id="finTotal">
@@ -1872,13 +1931,19 @@
     <div class="drawer-item" style="--i:0" data-page="home"><span class="di-ic">🏛️</span> الصفحة الرئيسية</div>
     <div class="drawer-item" style="--i:1" data-page="plan"><span class="di-ic">🕐</span> يومي مفصّل</div>
     <div class="drawer-item" style="--i:2" data-page="week"><span class="di-ic">🗓️</span> المهام الأسبوعية</div>
-    <div class="drawer-item" style="--i:3" data-page="gym"><span class="di-ic">🏋️</span> النادي</div>
+    <div class="drawer-item" style="--i:3" data-page="goals"><span class="di-ic">🎯</span> الأهداف طويلة المدى</div>
+
+    <div class="drawer-sep" style="--i:4"></div>
     <div class="drawer-item" style="--i:4" data-page="finance"><span class="di-ic">💰</span> الإدارة المالية</div>
     <div class="drawer-item" style="--i:5" data-page="subs"><span class="di-ic">💳</span> الاشتراكات</div>
-    <div class="drawer-item" style="--i:6" data-page="goals"><span class="di-ic">🎯</span> الأهداف طويلة المدى</div>
-    <div class="drawer-item" style="--i:7" data-page="purchases"><span class="di-ic">🛍️</span> مشتريات مهمة</div>
-    <div class="drawer-item" style="--i:8" data-page="notes"><span class="di-ic">📝</span> ملاحظات</div>
-    <div class="drawer-item" style="--i:9" data-page="calm"><span class="di-ic">🧘</span> تأمل</div>
+    <div class="drawer-item" style="--i:6" data-page="purchases"><span class="di-ic">🛍️</span> مشتريات مهمة</div>
+
+    <div class="drawer-sep" style="--i:7"></div>
+    <div class="drawer-item" style="--i:7" data-page="gym"><span class="di-ic">🏋️</span> النادي</div>
+    <div class="drawer-item" style="--i:8" data-page="calm"><span class="di-ic">🧘</span> تأمل</div>
+
+    <div class="drawer-sep" style="--i:9"></div>
+    <div class="drawer-item" style="--i:9" data-page="notes"><span class="di-ic">📝</span> ملاحظات</div>
     <div class="drawer-item" style="--i:10" data-page="summary"><span class="di-ic">📊</span> الملخص</div>
     <div class="drawer-foot">
       <div class="drawer-user" id="drawerUser">—</div>
@@ -1942,6 +2007,7 @@
       <button class="modal-btn cancel" id="accModalCancel">إلغاء</button>
       <button class="modal-btn save" id="accModalSave">حفظ</button>
     </div>
+    <button class="modal-btn danger" id="accModalClear" style="display:none;background:transparent;border:1px solid rgba(138,51,65,.4);">مسح كل العمليات 🧹</button>
     <button class="modal-btn danger" id="accModalDelete" style="display:none;">حذف الحساب 🗑️</button>
   </div>
 </div>
@@ -2013,6 +2079,61 @@
 </div>
 
 <!-- CONFIRM DIALOG -->
+<div class="modal-overlay" id="buyModal">
+  <div class="modal-card">
+    <div class="modal-title" id="buyTitle">كم دفعت؟</div>
+    <div class="modal-label">المبلغ الفعلي</div>
+    <input class="add-input" id="buyAmount" placeholder="المبلغ" inputmode="decimal" />
+    <div class="buy-hint" id="buyHint"></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="buyCancel">إلغاء</button>
+      <button class="modal-btn save" id="buyNext">التالي</button>
+    </div>
+    <button class="modal-btn danger" id="buySkip" style="background:transparent;border:1px solid var(--glass-brd);color:var(--text-1);">علّمه بدون خصم</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="txCatModal">
+  <div class="modal-card">
+    <div class="modal-title">تصنيف جديد</div>
+    <input class="add-input" id="txCatName" placeholder="اسم التصنيف... مثلاً صحة" maxlength="16" />
+    <input class="add-input" id="txCatIcon" placeholder="رمز (اختياري) مثلاً 💊" maxlength="4" />
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="txCatCancel">إلغاء</button>
+      <button class="modal-btn save" id="txCatSave">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="catDetailModal">
+  <div class="modal-card">
+    <div class="modal-title" id="catDetTitle">أكل</div>
+    <div class="cd-head">
+      <div>
+        <div class="cd-label">هذا الشهر</div>
+        <div class="cd-total" id="cdTotal">—</div>
+      </div>
+      <div class="chart-range" id="cdRange"></div>
+    </div>
+    <div class="cd-cmp" id="cdCmp"></div>
+    <div class="cd-list" id="cdList"></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="catDetClose" style="width:100%;">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="txDetailModal">
+  <div class="modal-card">
+    <div class="modal-title" id="txDetTitle">تفاصيل العملية</div>
+    <div class="td-amount" id="tdAmount">—</div>
+    <div class="td-rows" id="tdRows"></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" id="txDetClose" style="width:100%;">إغلاق</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="budgetModal">
   <div class="modal-card">
     <div class="modal-title">الميزانية الشهرية</div>
@@ -2605,7 +2726,7 @@ function showPage(name){
   if(current && !reduced){
     current.classList.add('leaving');
     current.classList.remove('active');
-    pageSwapTimer = setTimeout(()=>{ window.scrollTo(0,0); reveal(); }, 190);
+    pageSwapTimer = setTimeout(()=>{ window.scrollTo(0,0); reveal(); }, 130);
   } else {
     window.scrollTo(0,0);
     reveal();
@@ -5240,6 +5361,8 @@ let accounts = store.get('finAccounts', []); // {id,name,balance}
 let txData = store.get('finTx', {}); // {accId: [{id,date,amount,note}]}
 let activeAccId = null;
 let txType = 'expense';   // 'expense' | 'income'
+const TX_PAGE = 40;       // rows rendered at a time
+let txShown = TX_PAGE;
 
 function renderAccounts(){
   document.getElementById('accCount').textContent = `${accounts.length}/10`;
@@ -5274,12 +5397,19 @@ function renderFinTotal(){
   if(!el) return;
   const total = accounts.reduce((s,a)=> s + (Number(a.balance) || 0), 0);
   val.textContent = `${Math.round(total).toLocaleString('en-US')} ريال`;
+
+  // everything spent this month, across every account
+  const spentEl = document.getElementById('finSpent');
+  const spent = sumOf(monthExpenses(thisMonthKey()));
+  document.getElementById('finSpentVal').textContent =
+    `${Math.round(spent).toLocaleString('en-US')} ريال`;
   // only meaningful on the accounts list, and only once there is something to add up
   const onList = document.getElementById('finAccountsView');
   const visible = accounts.length > 0 &&
     document.getElementById('page-finance').classList.contains('active') &&
     onList && getComputedStyle(onList).display !== 'none';
   el.classList.toggle('show', !!visible);
+  spentEl.classList.toggle('show', !!visible);
 }
 let accModalMode = 'add', editingAccId = null;
 function openAccModal(mode, id){
@@ -5295,6 +5425,7 @@ function openAccModal(mode, id){
     document.getElementById('modalAccBal').value  = '';
   }
   document.getElementById('accModalDelete').style.display = (mode==='edit') ? 'block' : 'none';
+  document.getElementById('accModalClear').style.display  = (mode==='edit') ? 'block' : 'none';
   document.getElementById('accModal').classList.add('show');
 }
 document.getElementById('addAccBtn').addEventListener('click', ()=> openAccModal('add'));
@@ -5314,6 +5445,47 @@ document.getElementById('accModalSave').addEventListener('click', ()=>{
   store.set('finAccounts', accounts);
   document.getElementById('accModal').classList.remove('show');
   renderAccounts();
+});
+
+document.getElementById('accModalClear').addEventListener('click', async ()=>{
+  const a = accounts.find(x=>x.id===editingAccId);
+  if(!a) return;
+  const list = txData[editingAccId] || [];
+  if(!list.length){ showToast('ما فيه عمليات على هذا الحساب'); return; }
+
+  const spent  = list.filter(t=>t.type !== 'income').reduce((s,t)=> s + (Number(t.amount)||0), 0);
+  const income = list.filter(t=>t.type === 'income').reduce((s,t)=> s + (Number(t.amount)||0), 0);
+
+  const ok = await askConfirm(
+    `سيتم حذف ${list.length} عملية على "${a.name}" `
+    + `(صرف ${money(spent)} · إيداع ${money(income)}).\n\n`
+    + `الرصيد الحالي ${money(a.balance)} ريال يبقى كما هو، وتبدأ سجلاً جديداً منه.`,
+    { title:'مسح سجل العمليات', yes:'مسح الكل' });
+  if(!ok) return;
+
+  // the balance is the running total, so it stays — only the history goes.
+  // anything that pointed at these entries must forget them too.
+  const ids = new Set(list.map(t=>t.id));
+  subscriptions.forEach(sub=>{
+    Object.entries(sub.payTx || {}).forEach(([k, rec])=>{
+      if(rec.acc === editingAccId && ids.has(rec.tx)) delete sub.payTx[k];
+    });
+  });
+  purchases.forEach(pu=>{
+    if(pu.buyTx && pu.buyTx.acc === editingAccId && ids.has(pu.buyTx.tx)) delete pu.buyTx;
+  });
+
+  txData[editingAccId] = [];
+  store.set('finTx', txData);
+  store.set('subscriptions', subscriptions);
+  store.set('purchases', purchases);
+
+  document.getElementById('accModal').classList.remove('show');
+  buzz('strong');
+  showToast(`تم مسح ${list.length} عملية ✓`);
+  txShown = TX_PAGE;
+  renderAccounts();
+  if(activeAccId === editingAccId) renderAccountDetail();
 });
 
 document.getElementById('accModalDelete').addEventListener('click', async ()=>{
@@ -5339,6 +5511,8 @@ function openAccountDetail(id){
   document.getElementById('finAccountsView').style.display = 'none';
   document.getElementById('finDetailView').style.display = 'block';
   document.getElementById('finTotal').classList.remove('show');
+  document.getElementById('finSpent').classList.remove('show');
+  txShown = TX_PAGE;
   // always start on "صرف" so a stray deposit can't be logged by accident
   txType = 'expense';
   document.querySelectorAll('#txType .txt-btn').forEach(b=>
@@ -5366,7 +5540,9 @@ function renderAccountDetail(){
   const list = document.getElementById('txList');
   list.innerHTML = '';
   if(tx.length===0){ list.innerHTML = '<div class="empty">لا يوجد صرف مسجل بعد</div>'; }
-  tx.forEach(t=>{
+  // keep the DOM light: show a window, with a button for the rest
+  const shown = tx.slice(0, txShown);
+  shown.forEach(t=>{
     const isIncome = t.type === 'income';
     const row = document.createElement('div');
     row.className = 'tx-row ' + (isIncome ? 'income' : 'expense');
@@ -5376,8 +5552,21 @@ function renderAccountDetail(){
       <div class="tx-note">${esc(t.note || (isIncome ? 'إيداع' : 'صرف'))}</div>
       <div class="tx-amt${isIncome ? ' income' : ''}">${isIncome ? '+' : '−'}${t.amount.toLocaleString('en-US')}</div>
       <button class="tx-del" data-id="${t.id}">✕</button>`;
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', e=>{
+      if(e.target.closest('.tx-del')) return;
+      openTxDetail(activeAccId, t.id);
+    });
     list.appendChild(row);
   });
+  if(tx.length > txShown){
+    const more = document.createElement('button');
+    more.className = 'slot-add';
+    more.style.marginTop = '4px';
+    more.textContent = `عرض ${Math.min(TX_PAGE, tx.length - txShown)} عملية أقدم (${tx.length - txShown} متبقية)`;
+    more.addEventListener('click', ()=>{ txShown += TX_PAGE; renderAccountDetail(); });
+    list.appendChild(more);
+  }
   list.querySelectorAll('.tx-del').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const id = btn.dataset.id;
@@ -5406,7 +5595,7 @@ document.getElementById('txType').addEventListener('click', e=>{
 });
 
 /* ---- spending categories, monthly budget and month-on-month comparison ---- */
-const TX_CATS = {
+const TX_CATS_BUILTIN = {
   food:     { label:'أكل',     icon:'🍽️', color:'#a85c3a' },
   fuel:     { label:'بنزين',   icon:'⛽️', color:'#39496e' },
   shopping: { label:'تسوق',    icon:'🛍️', color:'#6b4a73' },
@@ -5414,6 +5603,14 @@ const TX_CATS = {
   fun:      { label:'ترفيه',   icon:'🎬', color:'#8a3341' },
   other:    { label:'أخرى',    icon:'📦', color:'#8a6d3a' },
 };
+const CAT_PALETTE = ['#4f7a5c','#8a6d3a','#39496e','#a85c3a','#6b4a73','#8a3341','#2f6b56','#ab9670'];
+let customTxCats = store.get('customTxCats', {});   // { key:{label,icon,color} }
+const TX_CATS = new Proxy({}, {
+  get: (_, k)=> TX_CATS_BUILTIN[k] || customTxCats[k],
+  has: (_, k)=> (k in TX_CATS_BUILTIN) || (k in customTxCats),
+  ownKeys: ()=> [...Object.keys(TX_CATS_BUILTIN), ...Object.keys(customTxCats)],
+  getOwnPropertyDescriptor: ()=> ({ enumerable:true, configurable:true }),
+});
 let txCat  = 'food';
 let budget = store.get('budget', 0);
 
@@ -5442,19 +5639,201 @@ function buildTxCatRow(){
   if(!row) return;
   row.innerHTML = '';
   row.style.display = (txType === 'income') ? 'none' : 'flex';
-  Object.entries(TX_CATS).forEach(([key, c])=>{
+  Object.keys(TX_CATS).forEach(key=>{
+    const c = TX_CATS[key];
     const chip = document.createElement('div');
     chip.className = 'cat-chip' + (key === txCat ? ' active' : '');
     chip.style.setProperty('--chip-c', c.color);
-    chip.textContent = `${c.icon} ${c.label}`;
+    chip.innerHTML = `<span>${c.icon} ${esc(c.label)}</span>`;
+    // one tap selects, a second tap on the selected one opens its breakdown
     chip.addEventListener('click', ()=>{
+      if(txCat === key){ openCatDetail(key); return; }
       txCat = key;
       row.querySelectorAll('.cat-chip').forEach(x=>x.classList.remove('active'));
       chip.classList.add('active');
     });
+    if(customTxCats[key]){
+      const x = document.createElement('button');
+      x.className = 'cat-del'; x.type = 'button'; x.textContent = '✕';
+      x.addEventListener('click', async e=>{
+        e.stopPropagation();
+        if(!await askConfirm(`سيتم حذف تصنيف "${c.label}". العمليات المسجّلة عليه تنتقل إلى "أخرى".`,
+            { title:'حذف تصنيف', yes:'حذف' })) return;
+        Object.values(txData).forEach(l=>(l||[]).forEach(t=>{ if(t.cat === key) t.cat = 'other'; }));
+        delete customTxCats[key];
+        store.set('customTxCats', customTxCats); store.set('finTx', txData);
+        if(txCat === key) txCat = 'other';
+        buildTxCatRow(); renderCatBreakdown();
+      });
+      chip.appendChild(x);
+    }
     row.appendChild(chip);
   });
+
+  const add = document.createElement('div');
+  add.className = 'cat-chip cat-add';
+  add.textContent = '+ إضافة';
+  add.addEventListener('click', ()=>{
+    document.getElementById('txCatName').value = '';
+    document.getElementById('txCatIcon').value = '';
+    document.getElementById('txCatModal').classList.add('show');
+    setTimeout(()=> document.getElementById('txCatName').focus(), 120);
+  });
+  row.appendChild(add);
 }
+
+const money = n => Math.round(Number(n) || 0).toLocaleString('en-US');
+
+/* ---- add a category of your own ---- */
+document.getElementById('txCatCancel').addEventListener('click', ()=>
+  document.getElementById('txCatModal').classList.remove('show'));
+document.getElementById('txCatModal').addEventListener('click', e=>{
+  if(e.target.id === 'txCatModal') e.currentTarget.classList.remove('show'); });
+document.getElementById('txCatSave').addEventListener('click', ()=>{
+  const name = document.getElementById('txCatName').value.trim();
+  if(!name) return;
+  const icon = document.getElementById('txCatIcon').value.trim() || '🏷️';
+  const key  = 'c' + Date.now().toString(36);
+  const used = Object.keys(customTxCats).length;
+  customTxCats[key] = { label:name, icon, color: CAT_PALETTE[used % CAT_PALETTE.length] };
+  store.set('customTxCats', customTxCats);
+  txCat = key;
+  document.getElementById('txCatModal').classList.remove('show');
+  buildTxCatRow();
+  buzz(); showToast('تم إضافة التصنيف ✓');
+});
+document.getElementById('txCatName').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') document.getElementById('txCatSave').click(); });
+
+/* ---- what a category cost you ---- */
+let cdKey = 'food', cdMonths = 1;
+function openCatDetail(key){
+  cdKey = key; cdMonths = 1;
+  renderCatDetail();
+  document.getElementById('catDetailModal').classList.add('show');
+}
+function monthsBack(n){
+  const out = [];
+  const d = parseLocalDate(todayKey); d.setDate(1);
+  for(let i = 0; i < n; i++){
+    out.push(toDateKey(d).slice(0,7));
+    d.setMonth(d.getMonth() - 1);
+  }
+  return out;
+}
+function renderCatDetail(){
+  const c = TX_CATS[cdKey] || TX_CATS.other;
+  document.getElementById('catDetTitle').textContent = `${c.icon} ${c.label}`;
+
+  const months = monthsBack(cdMonths);
+  const inRange = [];
+  Object.values(txData).forEach(l=>(l||[]).forEach(t=>{
+    if(t.type === 'income') return;
+    const cat = TX_CATS[t.cat] ? t.cat : 'other';
+    if(cat !== cdKey) return;
+    if(months.includes(monthKeyOf(t.date))) inRange.push(t);
+  }));
+  const total = sumOf(inRange);
+  document.getElementById('cdTotal').textContent = `${money(total)} ريال`;
+
+  // range picker
+  const row = document.getElementById('cdRange');
+  row.innerHTML = '';
+  [[1,'هذا الشهر'],[3,'٣ أشهر'],[6,'٦ أشهر']].forEach(([n,lbl])=>{
+    const btn = document.createElement('button');
+    btn.className = 'cr-btn' + (n === cdMonths ? ' active' : '');
+    btn.textContent = lbl;
+    btn.addEventListener('click', ()=>{ cdMonths = n; renderCatDetail(); });
+    row.appendChild(btn);
+  });
+
+  // share of total spending, and last month for comparison
+  const allSame = [];
+  Object.values(txData).forEach(l=>(l||[]).forEach(t=>{
+    if(t.type !== 'income' && months.includes(monthKeyOf(t.date))) allSame.push(t); }));
+  const share = sumOf(allSame) ? Math.round(total / sumOf(allSame) * 100) : 0;
+
+  let cmp = `يمثّل <b>${share}٪</b> من صرفك في هذه الفترة · ${inRange.length} عملية`;
+  if(cdMonths === 1){
+    const prev = [];
+    Object.values(txData).forEach(l=>(l||[]).forEach(t=>{
+      if(t.type === 'income') return;
+      const cat = TX_CATS[t.cat] ? t.cat : 'other';
+      if(cat === cdKey && monthKeyOf(t.date) === lastMonthKey()) prev.push(t); }));
+    const pt = sumOf(prev);
+    if(pt){
+      const d = total - pt, pct = Math.round(Math.abs(d)/pt*100);
+      cmp += d === 0 ? '' : `<br>${d > 0 ? 'أعلى' : 'أقل'} بـ <b class="${d>0?'up':'down'}">${pct}٪</b> من الشهر الماضي (${money(pt)})`;
+    }
+  }
+  document.getElementById('cdCmp').innerHTML = cmp;
+
+  const list = inRange.sort((a,b)=> a.date < b.date ? 1 : -1).slice(0, 40);
+  document.getElementById('cdList').innerHTML = list.length
+    ? list.map(t=>{
+        const d = parseLocalDate(t.date);
+        return `<div class="cd-row">
+          <span class="cd-amt">${money(t.amount)}</span>
+          <span class="cd-note">${esc(t.note || c.label)}</span>
+          <span class="cd-when">${d.getDate()} ${arMonths[d.getMonth()]}</span>
+        </div>`;
+      }).join('')
+    : '<div class="empty">ما فيه عمليات على هذا التصنيف</div>';
+}
+document.getElementById('catDetClose').addEventListener('click', ()=>
+  document.getElementById('catDetailModal').classList.remove('show'));
+document.getElementById('catDetailModal').addEventListener('click', e=>{
+  if(e.target.id === 'catDetailModal') e.currentTarget.classList.remove('show'); });
+
+/* ---- what the balance was at the time of one entry ----
+   Balances aren't stored per row, so we rebuild them by walking back
+   from today's balance through everything that happened since. */
+function openTxDetail(accId, txId){
+  const acc = accounts.find(a=>a.id === accId);
+  const list = (txData[accId] || []).slice();
+  const t = list.find(x=>x.id === txId);
+  if(!acc || !t) return;
+
+  // newest first
+  list.sort((a,b)=>{
+    if(a.date !== b.date) return a.date < b.date ? 1 : -1;
+    return String(b.id).localeCompare(String(a.id));
+  });
+  const idx = list.findIndex(x=>x.id === txId);
+
+  // undo every entry newer than this one to get the balance right after it
+  let after = Number(acc.balance) || 0;
+  for(let i = 0; i < idx; i++){
+    const x = list[i];
+    after -= (x.type === 'income' ? 1 : -1) * (Number(x.amount) || 0);
+  }
+  const delta  = (t.type === 'income' ? 1 : -1) * (Number(t.amount) || 0);
+  const before = after - delta;
+
+  const c = TX_CATS[t.cat] || null;
+  const d = parseLocalDate(t.date);
+  document.getElementById('txDetTitle').textContent = t.note || (t.type === 'income' ? 'إيداع' : 'صرف');
+  const amtEl = document.getElementById('tdAmount');
+  amtEl.className = 'td-amount ' + (t.type === 'income' ? 'income' : 'expense');
+  amtEl.textContent = `${t.type === 'income' ? '+' : '−'} ${money(t.amount)} ريال`;
+
+  const rows = [
+    ['الرصيد قبلها', `${money(before)} ريال`, false],
+    ['الرصيد بعدها', `${money(after)} ريال`,  true ],
+    ['الحساب',       acc.name,                false],
+    ['التاريخ',      `${d.getDate()} ${arMonths[d.getMonth()]} ${d.getFullYear()}`, false],
+  ];
+  if(c) rows.splice(3, 0, ['التصنيف', `${c.icon} ${c.label}`, false]);
+
+  document.getElementById('tdRows').innerHTML = rows.map(([k,v,hi])=>
+    `<div class="td-row${hi ? ' hi' : ''}"><span class="td-v">${esc(v)}</span><span class="td-k">${k}</span></div>`
+  ).join('');
+  document.getElementById('txDetailModal').classList.add('show');
+}
+document.getElementById('txDetClose').addEventListener('click', ()=>
+  document.getElementById('txDetailModal').classList.remove('show'));
+document.getElementById('txDetailModal').addEventListener('click', e=>{
+  if(e.target.id === 'txDetailModal') e.currentTarget.classList.remove('show'); });
 
 function renderBudget(){
   const box = document.getElementById('budgetBox');
@@ -6599,6 +6978,49 @@ document.getElementById('goalModalDelete').addEventListener('click', async ()=>{
 });
 renderGoals();
 
+/* Ask what a purchase actually cost before it is charged to an account.
+   Resolves to a number, 'skip', or null when cancelled. */
+function askBuyAmount(item){
+  return new Promise(resolve=>{
+    const modal = document.getElementById('buyModal');
+    const input = document.getElementById('buyAmount');
+    document.getElementById('buyTitle').textContent = `كم دفعت على "${item.title}"؟`;
+    input.value = item.price ? String(item.price) : '';
+    document.getElementById('buyHint').textContent = item.price
+      ? `السعر المتوقع كان ${money(item.price)} ريال — عدّله لو اختلف`
+      : 'اكتب المبلغ الفعلي';
+
+    function done(v){
+      modal.classList.remove('show');
+      btnNext.removeEventListener('click', onNext);
+      btnSkip.removeEventListener('click', onSkip);
+      btnCancel.removeEventListener('click', onCancel);
+      modal.removeEventListener('click', onBackdrop);
+      input.removeEventListener('keydown', onKey);
+      resolve(v);
+    }
+    const btnNext   = document.getElementById('buyNext');
+    const btnSkip   = document.getElementById('buySkip');
+    const btnCancel = document.getElementById('buyCancel');
+    const onNext = ()=>{
+      const v = parseFloat(input.value);
+      if(!v || v <= 0){ input.focus(); return; }
+      done(v);
+    };
+    const onSkip     = ()=> done('skip');
+    const onCancel   = ()=> done(null);
+    const onBackdrop = e => { if(e.target === modal) done(null); };
+    const onKey      = e => { if(e.key === 'Enter') onNext(); };
+    btnNext.addEventListener('click', onNext);
+    btnSkip.addEventListener('click', onSkip);
+    btnCancel.addEventListener('click', onCancel);
+    modal.addEventListener('click', onBackdrop);
+    input.addEventListener('keydown', onKey);
+    modal.classList.add('show');
+    setTimeout(()=> input.focus(), 120);
+  });
+}
+
 /* ================= PURCHASES =================
    A wishlist with optional prices, so you can see what the remaining
    items would actually cost before you commit. */
@@ -6701,6 +7123,7 @@ function renderPurchases(){
     clr.addEventListener('click', async ()=>{
       if(!await askConfirm(`سيتم حذف ${bought.length} مشترى تم شراؤها. لا يمكن التراجع.`,
           { title:'مسح المشتراة', yes:'مسح' })) return;
+      purchases.filter(x=>x.done && x.buyTx).forEach(x=> refundAccount(x.buyTx.acc, x.buyTx.tx));
       purchases = purchases.filter(x=>!x.done);
       store.set('purchases', purchases);
       buzz(); showToast('تم مسح المشتراة ✓');
@@ -6712,13 +7135,37 @@ function renderPurchases(){
   }
 
   wrap.querySelectorAll('.purch-check').forEach(btn=>{
-    btn.addEventListener('click', e=>{
+    btn.addEventListener('click', async e=>{
       e.stopPropagation();
       const p = purchases.find(x=>x.id===btn.dataset.id);
-      p.done = !p.done;
-      p.doneAt = p.done ? todayKey : null;
+
+      if(p.done){
+        // unticking also reverses the deduction it created
+        if(p.buyTx){ refundAccount(p.buyTx.acc, p.buyTx.tx); delete p.buyTx; }
+        p.done = false; p.doneAt = null;
+        store.set('purchases', purchases);
+        renderPurchases();
+        return;
+      }
+
+      const paid = await askBuyAmount(p);
+      if(paid === null) return;                        // cancelled
+
+      if(paid !== 'skip'){
+        const acc = await askPayFrom(paid, p.title);
+        if(acc === null) return;                       // cancelled
+        if(acc !== 'skip'){
+          const txId = chargeAccount(acc, paid, p.title, todayKey);
+          if(txId) p.buyTx = { acc, tx: txId, amount: paid };
+        }
+        p.price = paid;                                // remember what it really cost
+      }
+
+      p.done = true; p.doneAt = todayKey;
       store.set('purchases', purchases);
-      if(p.done){ buzz('strong'); celebrate(); showToast('تم الشراء ✓'); }
+      buzz('strong'); celebrate();
+      const accName = p.buyTx ? (accounts.find(a=>a.id===p.buyTx.acc)||{}).name : null;
+      showToast(accName ? `تم الشراء وخُصم من ${accName} ✓` : 'تم الشراء ✓');
       renderPurchases();
     });
   });
@@ -6783,6 +7230,7 @@ document.getElementById('purchModalDelete').addEventListener('click', async ()=>
   const p = purchases.find(x=>x.id===editingPurchId);
   if(!p) return;
   if(!await askConfirm(`سيتم حذف "${p.title}" من القائمة.`, { title:'حذف مشترى', yes:'حذف' })) return;
+  if(p.buyTx) refundAccount(p.buyTx.acc, p.buyTx.tx);
   purchases = purchases.filter(x=>x.id!==editingPurchId);
   editingPurchId = null;
   store.set('purchases', purchases);
