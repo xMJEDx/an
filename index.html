@@ -2303,7 +2303,13 @@ let applyingRemote = false;
 
 const enc = new TextEncoder(), dec = new TextDecoder();
 const toHex = buf => [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
-const toB64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+const toB64 = buf => {
+  // chunked: spreading a big array into fromCharCode overflows the stack
+  // (Safari at ~64KB), which silently killed sync once the data grew
+  const u = new Uint8Array(buf); let s = '';
+  for(let i=0;i<u.length;i+=8192) s += String.fromCharCode.apply(null, u.subarray(i, i+8192));
+  return btoa(s);
+};
 const fromB64 = b64 => Uint8Array.from(atob(b64), c=>c.charCodeAt(0));
 
 async function deriveIdentity(username, password){
@@ -2492,7 +2498,7 @@ async function pushNow(){
     localStorage.setItem('mrPulled', String(at));
     pill('تم الحفظ ☁️');
   }catch(e){
-    pill('تعذّر الحفظ — سيعاد المحاولة', true);
+    console.warn('sync push failed', e); pill('تعذّر الحفظ: ' + (e && e.message ? e.message : 'خطأ') + ' — سيعاد المحاولة', true);
     setTimeout(queueSync, 15000);
   }finally{
     syncing = false;
@@ -2526,7 +2532,7 @@ async function pullNow(opts){
       setTimeout(()=> location.reload(), 700);   // rebuild every view cleanly
     }
   }catch(e){
-    if(!quiet) pill('تعذّر الاتصال بالسحابة', true);
+    if(!quiet){ console.warn('sync pull failed', e); pill('تعذّر الاتصال: ' + (e && e.message ? e.message : 'خطأ'), true); }
   }
 }
 
